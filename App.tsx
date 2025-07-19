@@ -3,12 +3,13 @@ import { View } from "react-native";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/dashboard";
+import "./global.css";
 
 export default function App() {
   const [tela, setTela] = useState<"login" | "register" | "dashboard">("login");
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       {tela === "login" ? (
         <Login
           irParaRegister={() => setTela("register")}
