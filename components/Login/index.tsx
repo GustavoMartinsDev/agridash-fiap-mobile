@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { Text, View, TextInput, TouchableOpacity, Alert } from "react-native";
 
 type Props = {
   irParaRegister: () => void;
@@ -39,11 +32,17 @@ export default function Login({ irParaRegister, irParaDashboard }: Props) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Farm Fiap</Text>
-      <Text style={styles.subtitulo}>Controle de Estoque</Text>
+    <View className="flex-1 bg-farm-green-50 items-center justify-center p-6">
+      <Text className="text-3xl font-bold text-farm-green-800 mb-2">
+        Farm Fiap
+      </Text>
+      <Text className="text-lg text-farm-amber-700 mb-8">
+        Controle de Estoque
+      </Text>
       <TextInput
-        style={[styles.input, !emailValido && styles.inputErro]}
+        className={`w-full h-12 bg-white border rounded-lg px-4 mb-2 text-base text-farm-green-800 ${
+          !emailValido ? "border-farm-red-600" : "border-farm-amber-400"
+        }`}
         placeholder="E-mail"
         placeholderTextColor="#7c6f57"
         value={email}
@@ -52,10 +51,14 @@ export default function Login({ irParaRegister, irParaDashboard }: Props) {
         autoCapitalize="none"
       />
       {!emailValido && (
-        <Text style={styles.erro}>Digite um e-mail válido.</Text>
+        <Text className="text-farm-red-600 mb-2 self-start">
+          Digite um e-mail válido.
+        </Text>
       )}
       <TextInput
-        style={[styles.input, !senhaValida && styles.inputErro]}
+        className={`w-full h-12 bg-white border rounded-lg px-4 mb-2 text-base text-farm-green-800 ${
+          !senhaValida ? "border-farm-red-600" : "border-farm-amber-400"
+        }`}
         placeholder="Senha"
         placeholderTextColor="#7c6f57"
         value={senha}
@@ -63,85 +66,25 @@ export default function Login({ irParaRegister, irParaDashboard }: Props) {
         secureTextEntry
       />
       {!senhaValida && (
-        <Text style={styles.erro}>
+        <Text className="text-farm-red-600 mb-2 self-start">
           A senha deve ter pelo menos 6 caracteres.
         </Text>
       )}
       <TouchableOpacity
-        style={[
-          styles.botao,
-          !(emailValido && senhaValida && email && senha) &&
-            styles.botaoDesabilitado,
-        ]}
+        className={`w-full h-12 rounded-lg items-center justify-center mt-4 ${
+          emailValido && senhaValida && email && senha
+            ? "bg-farm-green-800"
+            : "bg-farm-amber-400"
+        }`}
         onPress={handleLogin}
         disabled={!(emailValido && senhaValida && email && senha)}
       >
-        <Text style={styles.textoBotao}>Entrar</Text>
+        <Text className="text-white text-lg font-bold">Entrar</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{ marginTop: 16 }} onPress={irParaRegister}>
-        <Text style={{ color: "#4e7934", textDecorationLine: "underline" }}>
-          Criar conta
-        </Text>
+      <TouchableOpacity className="mt-4" onPress={irParaRegister}>
+        <Text className="text-farm-green-800 underline">Criar conta</Text>
       </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#e6f2d6",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  titulo: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#4e7934",
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 18,
-    color: "#7c6f57",
-    marginBottom: 32,
-  },
-  input: {
-    width: "100%",
-    height: 48,
-    backgroundColor: "#fff",
-    borderColor: "#b2a177",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    fontSize: 16,
-    color: "#4e7934",
-  },
-  inputErro: {
-    borderColor: "#c0392b",
-  },
-  erro: {
-    color: "#c0392b",
-    marginBottom: 8,
-    alignSelf: "flex-start",
-  },
-  botao: {
-    width: "100%",
-    height: 48,
-    backgroundColor: "#4e7934",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 16,
-  },
-  botaoDesabilitado: {
-    backgroundColor: "#b2a177",
-  },
-  textoBotao: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});

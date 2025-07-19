@@ -7,7 +7,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Alert,
   Dimensions,
   Platform,
@@ -69,27 +68,34 @@ export default function Dashboard({ onLogout }: DashboardProps) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-farm-green-50">
       <StatusBar
         barStyle={Platform.OS === "ios" ? "dark-content" : "default"}
         backgroundColor="#e6f2d6"
       />
       <ScrollView
-        style={styles.container}
+        className="flex-1 bg-farm-green-50 p-4"
         contentContainerStyle={{ paddingBottom: 32 }}
       >
-        <View style={styles.header}>
-          <Text style={styles.titulo}>Dashboard Farm Fiap</Text>
+        <View className="flex-row items-center justify-between mb-2">
+          <Text className="text-2xl font-bold text-farm-green-800 mb-0 self-start">
+            Dashboard Farm Fiap
+          </Text>
           {onLogout && (
-            <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
-              <Text style={styles.logoutText}>Logout</Text>
+            <TouchableOpacity
+              className="bg-farm-red-600 py-2 px-4 rounded-lg"
+              onPress={onLogout}
+            >
+              <Text className="text-white font-bold text-base">Logout</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Gráfico de vendas por mês */}
-        <Text style={styles.sectionTitle}>Vendas por Mês</Text>
-        <View style={styles.chart}>
+        <Text className="text-xl font-bold text-farm-amber-700 mt-6 mb-2">
+          Vendas por Mês
+        </Text>
+        <View className="self-center mb-2">
           <LineChart
             data={vendasPorMes}
             width={screenWidth - 32}
@@ -109,8 +115,10 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         </View>
 
         {/* Gráfico de barras de estoque */}
-        <Text style={styles.sectionTitle}>Estoque Atual</Text>
-        <View style={styles.chart}>
+        <Text className="text-xl font-bold text-farm-amber-700 mt-6 mb-2">
+          Estoque Atual
+        </Text>
+        <View className="self-center mb-2">
           <BarChart
             data={estoque}
             width={screenWidth - 32}
@@ -125,8 +133,10 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         </View>
 
         {/* Gráfico de pizza de categorias */}
-        <Text style={styles.sectionTitle}>Categorias de Produtos</Text>
-        <View style={styles.chart}>
+        <Text className="text-xl font-bold text-farm-amber-700 mt-6 mb-2">
+          Categorias de Produtos
+        </Text>
+        <View className="self-center mb-2">
           <PieChart
             data={categorias}
             donut
@@ -143,17 +153,19 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         </View>
 
         {/* Formulário de vendas */}
-        <Text style={styles.sectionTitle}>Registrar Venda</Text>
-        <View style={styles.form}>
+        <Text className="text-xl font-bold text-farm-amber-700 mt-6 mb-2">
+          Registrar Venda
+        </Text>
+        <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
           <TextInput
-            style={styles.input}
+            className="h-11 border border-farm-amber-400 rounded-lg px-3 mb-2 text-farm-green-800 text-base"
             placeholder="Produto"
             placeholderTextColor="#7c6f57"
             value={produto}
             onChangeText={setProduto}
           />
           <TextInput
-            style={styles.input}
+            className="h-11 border border-farm-amber-400 rounded-lg px-3 mb-2 text-farm-green-800 text-base"
             placeholder="Quantidade"
             placeholderTextColor="#7c6f57"
             value={quantidade}
@@ -161,27 +173,34 @@ export default function Dashboard({ onLogout }: DashboardProps) {
             keyboardType="numeric"
           />
           <TextInput
-            style={styles.input}
+            className="h-11 border border-farm-amber-400 rounded-lg px-3 mb-2 text-farm-green-800 text-base"
             placeholder="Valor (R$)"
             placeholderTextColor="#7c6f57"
             value={valor}
             onChangeText={setValor}
             keyboardType="numeric"
           />
-          <TouchableOpacity style={styles.botao} onPress={registrarVenda}>
-            <Text style={styles.textoBotao}>Registrar</Text>
+          <TouchableOpacity
+            className="bg-farm-green-800 rounded-lg items-center justify-center h-11 mt-2"
+            onPress={registrarVenda}
+          >
+            <Text className="text-white font-bold text-base">Registrar</Text>
           </TouchableOpacity>
         </View>
 
         {/* Lista de vendas */}
-        <Text style={styles.sectionTitle}>Histórico de Vendas</Text>
-        <View style={styles.listaVendas}>
+        <Text className="text-xl font-bold text-farm-amber-700 mt-6 mb-2">
+          Histórico de Vendas
+        </Text>
+        <View className="bg-white rounded-lg p-3 mb-4 min-h-[44px]">
           {vendas.length === 0 && (
-            <Text style={{ color: "#7c6f57" }}>Nenhuma venda registrada.</Text>
+            <Text className="text-farm-amber-700">
+              Nenhuma venda registrada.
+            </Text>
           )}
           {vendas.map((v, i) => (
-            <View key={i} style={styles.vendaItem}>
-              <Text style={styles.vendaTexto}>
+            <View key={i} className="border-b border-farm-green-50 py-1">
+              <Text className="text-farm-green-800 text-base">
                 {v.produto} - {v.quantidade} un. - R$ {v.valor.toFixed(2)}
               </Text>
             </View>
@@ -191,99 +210,3 @@ export default function Dashboard({ onLogout }: DashboardProps) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#e6f2d6",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#e6f2d6",
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  titulo: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#4e7934",
-    marginBottom: 0,
-    alignSelf: "flex-start",
-  },
-  logoutButton: {
-    backgroundColor: "#c0392b",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  logoutText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#7c6f57",
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  chart: {
-    alignSelf: "center",
-    marginBottom: 8,
-  },
-  form: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  input: {
-    height: 44,
-    borderColor: "#b2a177",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    color: "#4e7934",
-    fontSize: 16,
-  },
-  botao: {
-    backgroundColor: "#4e7934",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 44,
-    marginTop: 8,
-  },
-  textoBotao: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  listaVendas: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    minHeight: 44,
-  },
-  vendaItem: {
-    borderBottomColor: "#e6f2d6",
-    borderBottomWidth: 1,
-    paddingVertical: 4,
-  },
-  vendaTexto: {
-    color: "#4e7934",
-    fontSize: 16,
-  },
-});

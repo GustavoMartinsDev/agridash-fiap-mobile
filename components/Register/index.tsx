@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { Text, View, TextInput, TouchableOpacity, Alert } from "react-native";
 
 type Props = {
   irParaLogin: () => void;
@@ -54,11 +47,15 @@ export default function Register({ irParaLogin }: Props) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Cadastro</Text>
-      <Text style={styles.subtitulo}>Crie sua conta</Text>
+    <View className="flex-1 bg-farm-green-50 items-center justify-center p-6">
+      <Text className="text-3xl font-bold text-farm-green-800 mb-2">
+        Cadastro
+      </Text>
+      <Text className="text-lg text-farm-amber-700 mb-8">Crie sua conta</Text>
       <TextInput
-        style={[styles.input, !emailValido && styles.inputErro]}
+        className={`w-full h-12 bg-white border rounded-lg px-4 mb-2 text-base text-farm-green-800 ${
+          !emailValido ? "border-farm-red-600" : "border-farm-amber-400"
+        }`}
         placeholder="E-mail"
         placeholderTextColor="#7c6f57"
         value={email}
@@ -67,10 +64,14 @@ export default function Register({ irParaLogin }: Props) {
         autoCapitalize="none"
       />
       {!emailValido && (
-        <Text style={styles.erro}>Digite um e-mail válido.</Text>
+        <Text className="text-farm-red-600 mb-2 self-start">
+          Digite um e-mail válido.
+        </Text>
       )}
       <TextInput
-        style={[styles.input, !senhaValida && styles.inputErro]}
+        className={`w-full h-12 bg-white border rounded-lg px-4 mb-2 text-base text-farm-green-800 ${
+          !senhaValida ? "border-farm-red-600" : "border-farm-amber-400"
+        }`}
         placeholder="Senha"
         placeholderTextColor="#7c6f57"
         value={senha}
@@ -78,12 +79,14 @@ export default function Register({ irParaLogin }: Props) {
         secureTextEntry
       />
       {!senhaValida && (
-        <Text style={styles.erro}>
+        <Text className="text-farm-red-600 mb-2 self-start">
           A senha deve ter pelo menos 6 caracteres.
         </Text>
       )}
       <TextInput
-        style={[styles.input, !senhasIguais && styles.inputErro]}
+        className={`w-full h-12 bg-white border rounded-lg px-4 mb-2 text-base text-farm-green-800 ${
+          !senhasIguais ? "border-farm-red-600" : "border-farm-amber-400"
+        }`}
         placeholder="Confirmar senha"
         placeholderTextColor="#7c6f57"
         value={confirmar}
@@ -91,20 +94,21 @@ export default function Register({ irParaLogin }: Props) {
         secureTextEntry
       />
       {!senhasIguais && (
-        <Text style={styles.erro}>As senhas não coincidem.</Text>
+        <Text className="text-farm-red-600 mb-2 self-start">
+          As senhas não coincidem.
+        </Text>
       )}
       <TouchableOpacity
-        style={[
-          styles.botao,
-          !(
-            emailValido &&
-            senhaValida &&
-            senhasIguais &&
-            email &&
-            senha &&
-            confirmar
-          ) && styles.botaoDesabilitado,
-        ]}
+        className={`w-full h-12 rounded-lg items-center justify-center mt-4 ${
+          emailValido &&
+          senhaValida &&
+          senhasIguais &&
+          email &&
+          senha &&
+          confirmar
+            ? "bg-farm-green-800"
+            : "bg-farm-amber-400"
+        }`}
         onPress={handleRegister}
         disabled={
           !(
@@ -117,10 +121,10 @@ export default function Register({ irParaLogin }: Props) {
           )
         }
       >
-        <Text style={styles.textoBotao}>Cadastrar</Text>
+        <Text className="text-white text-lg font-bold">Cadastrar</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{ marginTop: 16 }} onPress={irParaLogin}>
-        <Text style={{ color: "#4e7934", textDecorationLine: "underline" }}>
+      <TouchableOpacity className="mt-4" onPress={irParaLogin}>
+        <Text className="text-farm-green-800 underline">
           Já tem conta? Entrar
         </Text>
       </TouchableOpacity>
@@ -128,61 +132,3 @@ export default function Register({ irParaLogin }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#e6f2d6",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  titulo: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#4e7934",
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 18,
-    color: "#7c6f57",
-    marginBottom: 32,
-  },
-  input: {
-    width: "100%",
-    height: 48,
-    backgroundColor: "#fff",
-    borderColor: "#b2a177",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    fontSize: 16,
-    color: "#4e7934",
-  },
-  inputErro: {
-    borderColor: "#c0392b",
-  },
-  erro: {
-    color: "#c0392b",
-    marginBottom: 8,
-    alignSelf: "flex-start",
-  },
-  botao: {
-    width: "100%",
-    height: 48,
-    backgroundColor: "#4e7934",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 16,
-  },
-  botaoDesabilitado: {
-    backgroundColor: "#b2a177",
-  },
-  textoBotao: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});
