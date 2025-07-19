@@ -1,24 +1,23 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Dashboard from "./components/dashboard";
+import { LoginPage, RegisterPage, DashboardPage } from "./pages";
+import { ScreenType } from "./types";
 import "./global.css";
 
 export default function App() {
-  const [tela, setTela] = useState<"login" | "register" | "dashboard">("login");
+  const [tela, setTela] = useState<ScreenType>("login");
 
   return (
     <View className="flex-1">
       {tela === "login" ? (
-        <Login
+        <LoginPage
           irParaRegister={() => setTela("register")}
           irParaDashboard={() => setTela("dashboard")}
         />
       ) : tela === "register" ? (
-        <Register irParaLogin={() => setTela("login")} />
+        <RegisterPage irParaLogin={() => setTela("login")} />
       ) : (
-        <Dashboard onLogout={() => setTela("login")} />
+        <DashboardPage onLogout={() => setTela("login")} />
       )}
     </View>
   );
