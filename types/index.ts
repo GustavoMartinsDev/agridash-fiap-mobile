@@ -38,7 +38,8 @@ export interface Cooperado {
 }
 
 export interface Produto {
-  id: string;
+  id?: string;
+  id_produto?: string;
   nome: string;
   codigo: string;
   preco: number;
@@ -46,15 +47,19 @@ export interface Produto {
 
 export interface Estoque {
   id: string;
-  produto: string;
-  quantidade: number;
-  capacidade: number;
-  data: Date;
+  id_produto: number;
+  nome_produto: string;
+  quantidade_estoque: number;
+  capacidade_estoque: number;
+  status_estoque: string;
+  unidade_medida: string;
+  valor_unitario_producao: number;
+  valor_unitario_venda: number;
 }
 
 export interface Venda {
   id: string;
-  produto: string;
+  produto: string; // mantenho produto para compatibilidade
   quantidade: number;
   valor: number;
   cooperado: string;

@@ -31,27 +31,9 @@ export const cooperadosService = {
 };
 
 export const produtosService = {
-  async getProdutos(): Promise<Produto[]> {
-    const querySnapshot = await getDocs(collection(db, "produtos"));
-    return querySnapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        }) as Produto
-    );
-  },
-
-  async getProdutoByNome(nome: string): Promise<Produto | null> {
-    const q = query(collection(db, "produtos"), where("nome", "==", nome));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) return null;
-    const doc = querySnapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as Produto;
-  },
-
-  async adicionarProduto(produto: Omit<Produto, "id">): Promise<void> {
-    await addDoc(collection(db, "produtos"), produto);
+  // Os produtos agora estão na coleção estoque
+  async getProdutoByNome(nomeProduto: string): Promise<Estoque | null> {
+    return estoqueService.getEstoquePorProduto(nomeProduto);
   },
 };
 
@@ -63,36 +45,32 @@ export const estoqueService = {
         ({
           id: doc.id,
           ...doc.data(),
-          data: doc.data().data.toDate(),
         }) as Estoque
     );
   },
 
-  async getEstoquePorProduto(produto: string): Promise<Estoque | null> {
-    const q = query(collection(db, "estoque"), where("produto", "==", produto));
+  async getEstoquePorProduto(nomeProduto: string): Promise<Estoque | null> {
+    const q = query(
+      collection(db, "estoque"),
+      where("nome_produto", "==", nomeProduto)
+    );
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) return null;
     const doc = querySnapshot.docs[0];
     return {
       id: doc.id,
       ...doc.data(),
-      data: doc.data().data.toDate(),
     } as Estoque;
   },
 
-  async adicionarEstoque(produto: string, quantidade: number): Promise<void> {
-    await addDoc(collection(db, "estoque"), {
-      produto,
-      quantidade,
-      capacidade: 1000,
-      data: new Date(),
-    });
+  async adicionarEstoque(estoque: Omit<Estoque, "id">): Promise<void> {
+    await addDoc(collection(db, "estoque"), estoque);
   },
 
   async atualizarEstoque(id: string, novaQuantidade: number): Promise<void> {
     const estoqueRef = doc(db, "estoque", id);
     await updateDoc(estoqueRef, {
-      quantidade: novaQuantidade,
+      quantidade_estoque: novaQuantidade,
     });
   },
 };

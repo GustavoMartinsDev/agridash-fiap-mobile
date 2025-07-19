@@ -33,13 +33,13 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
   });
 
   const [cooperados, setCooperados] = useState<Cooperado[]>([]);
-  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [produtosEstoque, setProdutosEstoque] = useState<Estoque[]>([]);
   const [estoque, setEstoque] = useState<Estoque | null>(null);
   const [valor, setValor] = useState<number>(0);
 
   useEffect(() => {
     loadCooperados();
-    loadProdutos();
+    loadProdutosEstoque();
   }, []);
 
   useEffect(() => {
@@ -58,12 +58,16 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
     }
   };
 
-  const loadProdutos = async () => {
+  const loadProdutosEstoque = async () => {
     try {
-      const data = await produtosService.getProdutos();
-      setProdutos(data);
+      const data = await estoqueService.getEstoque();
+      // Filtra apenas produtos com quantidade > 0 e status ativo
+      const produtosComEstoque = data.filter(
+        (item) => item.quantidade_estoque > 0 && item.status_estoque !== "baixo"
+      );
+      setProdutosEstoque(produtosComEstoque);
     } catch (error) {
-      Alert.alert("Erro", "Falha ao carregar produtos");
+      Alert.alert("Erro", "Falha ao carregar produtos do estoque");
     }
   };
 
@@ -82,7 +86,8 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
     try {
       const produto = await produtosService.getProdutoByNome(formData.produto);
       if (produto && formData.quantidade) {
-        const totalValue = produto.preco * Number(formData.quantidade);
+        const totalValue =
+          produto.valor_unitario_venda * Number(formData.quantidade);
         setValor(totalValue);
       }
     } catch (error) {
@@ -98,7 +103,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       return;
     }
 
-    if (estoque && Number(quantidade) > estoque.quantidade) {
+    if (estoque && Number(quantidade) > estoque.quantidade_estoque) {
       Alert.alert("Erro", "Quantidade insuficiente em estoque.");
       return;
     }
@@ -114,7 +119,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       await vendasService.adicionarVenda(vendaData);
 
       if (estoque) {
-        const novaQuantidade = estoque.quantidade - Number(quantidade);
+        const novaQuantidade = estoque.quantidade_estoque - Number(quantidade);
         await estoqueService.atualizarEstoque(estoque.id, novaQuantidade);
       }
 
@@ -138,14 +143,14 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
     return produto && quantidade && cooperado;
   };
 
-  const produtoOptions: FSelectOption[] = produtos.map((p) => ({
-    label: p.nome,
-    value: p.nome,
+  const produtoOptions: FSelectOption[] = produtosEstoque.map((estoque) => ({
+    label: estoque.nome_produto,
+    value: estoque.nome_produto,
   }));
 
   const cooperadoOptions: FSelectOption[] = cooperados.map((c) => ({
-    label: `${c.nome} - ${c.fazenda}`,
-    value: c.nome,
+    label: `${c.nome}`,
+    value: c.id,
   }));
 
   return (
@@ -167,22 +172,20 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       {estoque && (
         <FContainer className="mb-2 p-2 bg-farm-green-50 rounded">
           <FInputField
-            label="Código do Produto"
-            value={
-              produtos.find((p) => p.nome === formData.produto)?.codigo || ""
-            }
+            label="Produto Selecionado"
+            value={formData.produto}
             editable={false}
             className="mb-2"
           />
           <FInputField
             label="Quantidade em Estoque"
-            value={estoque.quantidade.toString()}
+            value={estoque.quantidade_estoque.toString()}
             editable={false}
             className="mb-2"
           />
           <FInputField
             label="Capacidade do Estoque"
-            value={estoque.capacidade.toString()}
+            value={estoque.capacidade_estoque.toString()}
             editable={false}
           />
         </FContainer>
