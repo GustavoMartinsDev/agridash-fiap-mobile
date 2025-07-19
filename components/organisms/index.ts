@@ -1,6 +1,7 @@
 export { FLoginForm } from "./FLoginForm";
 export { FRegisterForm } from "./FRegisterForm";
 export { FSalesForm } from "./FSalesForm";
+export { FStockForm } from "./FStockForm";
 export { FSalesList } from "./FSalesList";
 export { FChartContainer } from "./FChartContainer";
 

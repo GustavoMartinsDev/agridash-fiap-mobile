@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Alert } from "react-native";
 import { FContainer, FButton } from "../../atoms";
 import { FInputField, FLinkButton } from "../../molecules";
+import { authService } from "../../../services/auth";
 import {
   FormData,
   ValidationState,
@@ -19,7 +20,7 @@ export interface FRegisterFormProps
 export const FRegisterForm: React.FC<FRegisterFormProps> = ({
   irParaLogin,
   onSubmit,
-  loading = false,
+  loading: externalLoading = false,
   className = "",
 }) => {
   const [formData, setFormData] = useState<FormData>({
@@ -33,6 +34,8 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
     senhaValida: true,
     senhasIguais: true,
   });
+
+  const [loading, setLoading] = useState(false);
 
   const validarEmail = (text: string) => {
     setFormData((prev) => ({ ...prev, email: text }));
@@ -59,26 +62,81 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { emailValido, senhaValida, senhasIguais } = validation;
     const { email, senha, confirmarSenha } = formData;
 
     if (
-      emailValido &&
-      senhaValida &&
-      senhasIguais &&
-      email &&
-      senha &&
-      confirmarSenha
+      !emailValido ||
+      !senhaValida ||
+      !senhasIguais ||
+      !email ||
+      !senha ||
+      !confirmarSenha
     ) {
+      Alert.alert("Erro", "Verifique os campos e tente novamente.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const user = await authService.register(email, senha);
+
+      Alert.alert(
+        "Sucesso",
+        `Conta criada com sucesso! Bem-vindo, ${user.email}!`
+      );
+
       if (onSubmit) {
         onSubmit(formData);
       } else {
-        Alert.alert("Cadastro realizado!", "Conta criada com sucesso!");
         irParaLogin?.();
       }
-    } else {
-      Alert.alert("Erro", "Verifique os campos e tente novamente.");
+    } catch (error: any) {
+      console.error("Erro no registro:", error);
+
+      let errorMessage = "Erro ao criar conta. Tente novamente.";
+
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Este e-mail já está em uso. Tente fazer login.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "E-mail inválido.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Senha muito fraca. Use pelo menos 6 caracteres.";
+      } else if (error.code === "auth/operation-not-allowed") {
+        errorMessage = "Criação de contas desabilitada no momento.";
+      } else if (
+        error.code === "auth/invalid-api-key" ||
+        (error.error &&
+          error.error.message &&
+          error.error.message.includes("API key not valid"))
+      ) {
+        errorMessage =
+          "Chave de API do Firebase inválida. Verifique as configurações.";
+      } else if (
+        error.message &&
+        error.message.includes("Firebase not configured")
+      ) {
+        errorMessage = "Sistema em modo demo. Cadastro simulado com sucesso!";
+
+        Alert.alert("Sucesso", "Conta criada com sucesso no modo demo!");
+
+        if (onSubmit) {
+          onSubmit(formData);
+        } else {
+          irParaLogin?.();
+        }
+        return;
+      } else if (error.message) {
+        errorMessage = `Erro: ${error.message}`;
+      } else if (error.error && error.error.message) {
+        errorMessage = `Erro: ${error.error.message}`;
+      }
+
+      Alert.alert("Erro", errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -136,7 +194,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
         fullWidth
         onPress={handleSubmit}
         disabled={!isFormValid()}
-        loading={loading}
+        loading={loading || externalLoading}
         className="mb-4"
       >
         Cadastrar

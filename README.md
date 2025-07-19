@@ -1,23 +1,134 @@
-# 🌱 Farm Fiap - Aplicativo de Controle de Estoque
+# Farm Fiap - Aplicativo de Controle de Estoque
 
-## 📋 Sobre o Projeto
+## Sobre o Projeto
 
-O **Farm Fiap** é um aplicativo mobile desenvolvido para controle de estoque agrícola, oferecendo uma interface moderna e intuitiva para gestão de produtos, vendas e visualização de dados através de gráficos interativos.
+O Farm Fiap é um aplicativo mobile desenvolvido para controle de estoque agrícola, oferecendo uma interface moderna e intuitiva para gestão de produtos, vendas e visualização de dados através de gráficos interativos.
 
-## 📱 Funcionalidades
+## Funcionalidades
 
-- ✅ **Login/Cadastro** com validação em tempo real
-- 📊 **Dashboard** com gráficos interativos
-- 💰 **Registro de vendas**
-- 📈 **Visualização de dados** (vendas por mês, estoque, categorias)
-- 🎨 **Design system** consistente
-- 📱 **Interface responsiva**
+- Login/Cadastro com Firebase Authentication
+- Dashboard com gráficos interativos
+- Registro de vendas em tempo real
+- Gerenciamento de estoque
+- Visualização de dados (vendas por mês, estoque, categorias)
+- Design system consistente com Atomic Design
+- Interface responsiva
 
-## 🛠️ Tecnologias
+## Tecnologias
 
-- **React Native** + **Expo**
-- **TypeScript** para type safety
-- **NativeWind** para estilização (Tailwind CSS)
+- React Native + Expo
+- TypeScript para type safety
+- NativeWind para estilização (Tailwind CSS)
+- Firebase (Authentication + Firestore)
+- React Native Gifted Charts
+- Atomic Design Pattern
+
+## Configuração
+
+### Requisitos
+
+- Node.js
+- Expo CLI
+- Firebase Project
+
+### Instalação
+
+```bash
+npm install
+```
+
+### Configuração do Firebase
+
+1. Crie um projeto no Firebase Console
+2. Configure Authentication e Firestore
+3. Crie o arquivo `.env` na raiz do projeto:
+
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+### Execução
+
+```bash
+npx expo start
+```
+
+## Estrutura do Projeto
+
+```
+components/
+  atoms/           # Componentes básicos (FButton, FInput, etc.)
+  molecules/       # Combinações de atoms
+  organisms/       # Componentes complexos (FSalesForm, FStockForm)
+  templates/       # Layout templates
+pages/             # Páginas da aplicação
+services/          # Serviços Firebase
+types/             # Definições TypeScript
+config/            # Configurações Firebase
+scripts/           # Scripts utilitários
+```
+
+## Firebase Collections
+
+### cooperados
+
+- nome: string
+- fazenda: string
+- email: string
+- telefone: string
+
+### produtos
+
+- nome: string
+- codigo: string
+- preco: number
+- categoria: string
+
+### estoque
+
+- produto: string
+- quantidade: number
+- capacidade: number
+- data: timestamp
+
+### vendas
+
+- produto: string
+- quantidade: number
+- valor: number
+- cooperado: string
+- data: timestamp
+
+## Scripts Disponíveis
+
+- `npm start` - Inicia o servidor Expo
+- `npm run android` - Executa no Android
+- `npm run ios` - Executa no iOS
+- `npm run web` - Executa no navegador
+
+## Componentes Principais
+
+### FSalesForm
+
+Formulário para registro de vendas com validação de estoque em tempo real.
+
+### FStockForm
+
+Formulário para gerenciamento de estoque com cálculo de ocupação.
+
+### Dashboard
+
+Interface principal com gráficos e navegação por tabs.
+
+## Licença
+
+Este projeto está sob a licença MIT.
+
 - **React Native Gifted Charts** para gráficos
 - **Atomic Design** para arquitetura de componentes
 

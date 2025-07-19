@@ -1,58 +1,167 @@
-import React, { useState } from "react";
-import { Dimensions } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Dimensions, Alert } from "react-native";
 import { LineChart, BarChart, PieChart } from "react-native-gifted-charts";
 import {
   DashboardTemplate,
   Section,
-  SalesForm,
-  SalesList,
-  ChartContainer,
   FText,
+  FContainer,
+  FButton,
 } from "../components";
-import { NavigationProps, VendaData, ChartData } from "../types";
+import {
+  FSalesForm,
+  FStockForm,
+  FSalesList,
+  FChartContainer,
+} from "../components/organisms";
+import { NavigationProps, Venda, Estoque, ChartData } from "../types";
+import { vendasService, estoqueService } from "../services/firebase";
 
 const screenWidth = Dimensions.get("window").width;
 
 export interface DashboardPageProps extends NavigationProps {}
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
-  // Mock data for charts
-  const vendasPorMes: ChartData[] = [
-    { value: 20, label: "Jan" },
-    { value: 45, label: "Fev" },
-    { value: 28, label: "Mar" },
-    { value: 80, label: "Abr" },
-    { value: 99, label: "Mai" },
-    { value: 43, label: "Jun" },
-  ];
+  const [vendas, setVendas] = useState<Venda[]>([]);
+  const [estoque, setEstoque] = useState<Estoque[]>([]);
+  const [activeTab, setActiveTab] = useState<"vendas" | "estoque">("vendas");
+  const [loading, setLoading] = useState(true);
 
-  const estoque: ChartData[] = [
-    { value: 40, label: "Milho", frontColor: "#4e7934" },
-    { value: 30, label: "Soja", frontColor: "#b2a177" },
-    { value: 20, label: "Trigo", frontColor: "#7c6f57" },
-    { value: 10, label: "Café", frontColor: "#c0392b" },
-  ];
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const categorias: ChartData[] = [
-    { value: 40, color: "#4e7934", text: "Grãos" },
-    { value: 30, color: "#b2a177", text: "Legumes" },
-    { value: 20, color: "#7c6f57", text: "Frutas" },
-    { value: 10, color: "#c0392b", text: "Outros" },
-  ];
-
-  const [vendas, setVendas] = useState<VendaData[]>([]);
-
-  const handleNovaVenda = (venda: VendaData) => {
-    setVendas((prev) => [...prev, venda]);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [vendasData, estoqueData] = await Promise.all([
+        vendasService.getVendas(),
+        estoqueService.getEstoque(),
+      ]);
+      setVendas(vendasData);
+      setEstoque(estoqueData);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      Alert.alert("Erro", "Não foi possível carregar os dados");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const vendasPorMes = () => {
+    const meses = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ];
+    const vendasPorMes = new Array(12).fill(0);
+
+    vendas.forEach((venda) => {
+      const mes = venda.data.getMonth();
+      vendasPorMes[mes] += venda.valor;
+    });
+
+    return meses.map((mes, index) => ({
+      value: vendasPorMes[index],
+      label: mes,
+    }));
+  };
+
+  const estoqueData = (): ChartData[] => {
+    return estoque.map((item) => ({
+      value: item.quantidade,
+      label: item.produto,
+      frontColor: "#4e7934",
+    }));
+  };
+
+  const categoriasData = (): ChartData[] => {
+    const produtosCategorias: Record<string, { value: number; color: string }> =
+      {
+        Soja: { value: 0, color: "#4e7934" },
+        Milho: { value: 0, color: "#b2a177" },
+        Arroz: { value: 0, color: "#7c6f57" },
+        Feijão: { value: 0, color: "#c0392b" },
+        Trigo: { value: 0, color: "#e67e22" },
+      };
+
+    vendas.forEach((venda) => {
+      if (produtosCategorias[venda.produto]) {
+        produtosCategorias[venda.produto].value += venda.valor;
+      }
+    });
+
+    return Object.entries(produtosCategorias)
+      .map(([produto, data]) => ({
+        value: data.value,
+        color: data.color,
+        text: produto,
+      }))
+      .filter((item) => item.value > 0);
+  };
+
+  const handleNovaVenda = async () => {
+    try {
+      const vendasData = await vendasService.getVendas();
+      setVendas(vendasData);
+    } catch (error) {
+      console.error("Erro ao recarregar vendas:", error);
+    }
+  };
+
+  const handleNovoEstoque = (novoEstoque: Estoque) => {
+    setEstoque((prev) => [
+      novoEstoque,
+      ...prev.filter((e) => e.produto !== novoEstoque.produto),
+    ]);
+  };
+
+  if (loading) {
+    return (
+      <DashboardTemplate title="Dashboard Farm Fiap" onLogout={onLogout}>
+        <FContainer className="flex-1 justify-center items-center">
+          <FText variant="title" color="primary">
+            Carregando...
+          </FText>
+        </FContainer>
+      </DashboardTemplate>
+    );
+  }
 
   return (
     <DashboardTemplate title="Dashboard Farm Fiap" onLogout={onLogout}>
-      {/* Gráfico de vendas por mês */}
+      <FContainer className="flex-row mb-4">
+        <FButton
+          variant={activeTab === "vendas" ? "primary" : "secondary"}
+          size="medium"
+          onPress={() => setActiveTab("vendas")}
+          className="flex-1 mr-2"
+        >
+          Vendas
+        </FButton>
+        <FButton
+          variant={activeTab === "estoque" ? "primary" : "secondary"}
+          size="medium"
+          onPress={() => setActiveTab("estoque")}
+          className="flex-1 ml-2"
+        >
+          Estoque
+        </FButton>
+      </FContainer>
+
       <Section title="Vendas por Mês">
-        <ChartContainer>
+        <FChartContainer>
           <LineChart
-            data={vendasPorMes}
+            data={vendasPorMes()}
             width={screenWidth - 32}
             height={180}
             color="#4e7934"
@@ -67,14 +176,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
             yAxisTextStyle={{ color: "#7c6f57" }}
             noOfSections={4}
           />
-        </ChartContainer>
+        </FChartContainer>
       </Section>
 
-      {/* Gráfico de barras de estoque */}
       <Section title="Estoque Atual">
-        <ChartContainer>
+        <FChartContainer>
           <BarChart
-            data={estoque}
+            data={estoqueData()}
             width={screenWidth - 32}
             height={180}
             barWidth={32}
@@ -84,14 +192,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
             xAxisLabelTextStyle={{ color: "#7c6f57" }}
             yAxisTextStyle={{ color: "#7c6f57" }}
           />
-        </ChartContainer>
+        </FChartContainer>
       </Section>
 
-      {/* Gráfico de pizza de categorias */}
       <Section title="Categorias de Produtos">
-        <ChartContainer>
+        <FChartContainer>
           <PieChart
-            data={categorias}
+            data={categoriasData()}
             donut
             showText
             textColor="white"
@@ -103,18 +210,48 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
               </FText>
             )}
           />
-        </ChartContainer>
+        </FChartContainer>
       </Section>
 
-      {/* Formulário de vendas */}
-      <Section title="Registrar Venda">
-        <SalesForm onSubmit={handleNovaVenda} className="mb-4" />
-      </Section>
+      {activeTab === "vendas" ? (
+        <>
+          <Section title="Registrar Venda">
+            <FSalesForm onSubmit={handleNovaVenda} className="mb-4" />
+          </Section>
 
-      {/* Lista de vendas */}
-      <Section title="Histórico de Vendas">
-        <SalesList vendas={vendas} />
-      </Section>
+          <Section title="Histórico de Vendas">
+            <FSalesList vendas={vendas} />
+          </Section>
+        </>
+      ) : (
+        <>
+          <Section title="Gerenciar Estoque">
+            <FStockForm onSubmit={handleNovoEstoque} className="mb-4" />
+          </Section>
+
+          <Section title="Estoque Atual">
+            <FContainer>
+              {estoque.map((item, index) => (
+                <FContainer
+                  key={index}
+                  className="p-3 mb-2 bg-white rounded-lg shadow"
+                >
+                  <FText variant="subtitle" color="primary" className="mb-1">
+                    {item.produto}
+                  </FText>
+                  <FText variant="body" color="secondary">
+                    Quantidade: {item.quantidade} / {item.capacidade}
+                  </FText>
+                  <FText variant="caption" color="secondary">
+                    Ocupação:{" "}
+                    {((item.quantidade / item.capacidade) * 100).toFixed(1)}%
+                  </FText>
+                </FContainer>
+              ))}
+            </FContainer>
+          </Section>
+        </>
+      )}
     </DashboardTemplate>
   );
 };

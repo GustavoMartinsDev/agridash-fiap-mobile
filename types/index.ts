@@ -1,10 +1,8 @@
-// Base types for components
 export interface BaseComponentProps {
   className?: string;
   testID?: string;
 }
 
-// Form types
 export interface FormData {
   email: string;
   senha: string;
@@ -17,11 +15,12 @@ export interface ValidationState {
   senhasIguais?: boolean;
 }
 
-// Dashboard types
 export interface VendaData {
   produto: string;
   quantidade: number;
   valor: number;
+  cooperado?: string;
+  data?: Date;
 }
 
 export interface ChartData {
@@ -32,7 +31,41 @@ export interface ChartData {
   text?: string;
 }
 
-// Navigation types
+export interface Cooperado {
+  id: string;
+  nome: string;
+  fazenda: string;
+}
+
+export interface Produto {
+  id: string;
+  nome: string;
+  codigo: string;
+  preco: number;
+}
+
+export interface Estoque {
+  id: string;
+  produto: string;
+  quantidade: number;
+  capacidade: number;
+  data: Date;
+}
+
+export interface Venda {
+  id: string;
+  produto: string;
+  quantidade: number;
+  valor: number;
+  cooperado: string;
+  data: Date;
+}
+
+export interface User {
+  uid: string;
+  email: string;
+}
+
 export type ScreenType = "login" | "register" | "dashboard";
 
 export interface NavigationProps {
@@ -42,10 +75,8 @@ export interface NavigationProps {
   onLogout?: () => void;
 }
 
-// Button types
 export type ButtonVariant = "primary" | "secondary" | "danger";
 export type ButtonSize = "small" | "medium" | "large";
 
-// Input types
 export type InputType = "text" | "email" | "password" | "number";
 export type InputState = "default" | "error" | "success";
