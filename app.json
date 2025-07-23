@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "fiap-farm-mobile",
-    "slug": "fiap-farm-mobile",
+    "name": "agridash",
+    "slug": "agridash",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
