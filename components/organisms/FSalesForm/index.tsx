@@ -44,6 +44,13 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
   const [valor, setValor] = useState<number>(0);
   const [vendas, setVendas] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [filtros, setFiltros] = useState({
+    produto: "",
+    cooperado: "",
+    dataInicio: "",
+    dataFim: "",
+  });
+  const [vendasFiltradas, setVendasFiltradas] = useState<any[]>([]);
 
   useEffect(() => {
     loadCooperados();
@@ -57,6 +64,10 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       loadEstoque();
     }
   }, [formData.produto, formData.quantidade]);
+
+  useEffect(() => {
+    aplicarFiltros();
+  }, [vendas, filtros]);
 
   const loadCooperados = async () => {
     try {
@@ -83,6 +94,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
         return (b as any).id - (a as any).id;
       });
       setVendas(vendasOrdenadas);
+      setVendasFiltradas(vendasOrdenadas);
     } catch (error) {
       Alert.alert("Erro", "Falha ao carregar histórico de vendas");
     }
@@ -183,6 +195,62 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
   const isFormValid = () => {
     const { produto, quantidade, cooperado } = formData;
     return produto && quantidade && cooperado;
+  };
+
+  const aplicarFiltros = () => {
+    let vendasFiltradas = [...vendas];
+
+    if (filtros.produto) {
+      vendasFiltradas = vendasFiltradas.filter((venda) =>
+        venda.produto.toLowerCase().includes(filtros.produto.toLowerCase())
+      );
+    }
+
+    if (filtros.cooperado) {
+      vendasFiltradas = vendasFiltradas.filter((venda) =>
+        venda.cooperado.toLowerCase().includes(filtros.cooperado.toLowerCase())
+      );
+    }
+
+    if (filtros.dataInicio) {
+      vendasFiltradas = vendasFiltradas.filter((venda) => {
+        const dataVenda = new Date(venda.data_venda);
+        const dataInicio = new Date(filtros.dataInicio);
+        return dataVenda >= dataInicio;
+      });
+    }
+
+    if (filtros.dataFim) {
+      vendasFiltradas = vendasFiltradas.filter((venda) => {
+        const dataVenda = new Date(venda.data_venda);
+        const dataFim = new Date(filtros.dataFim);
+        return dataVenda <= dataFim;
+      });
+    }
+
+    setVendasFiltradas(vendasFiltradas);
+  };
+
+  const limparFiltros = () => {
+    setFiltros({
+      produto: "",
+      cooperado: "",
+      dataInicio: "",
+      dataFim: "",
+    });
+  };
+
+  const calcularTotalVendas = () => {
+    return vendasFiltradas.reduce((total, venda) => {
+      const valor = typeof venda.valor === "number" ? venda.valor : 0;
+      return total + valor;
+    }, 0);
+  };
+
+  const calcularQuantidadeTotal = () => {
+    return vendasFiltradas.reduce((total, venda) => {
+      return total + (venda.quantidade || 0);
+    }, 0);
   };
 
   const produtoOptions: FSelectOption[] = produtosEstoque.map((estoque) => ({
@@ -357,28 +425,106 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       ) : (
         <>
           <FText variant="subtitle" color="primary" className="mb-3">
-            📊 Histórico de Vendas ({vendas.length} vendas)
+            📊 Histórico de Vendas
           </FText>
 
-          <ScrollView className="max-h-96">
-            {vendas.length === 0 ? (
+          {/* Seção de Filtros */}
+          <FContainer className="mb-4 p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+            <FText variant="body" color="primary" className="font-bold mb-2">
+              🔍 Filtros
+            </FText>
+
+            <FContainer className="flex-row mb-2">
+              <FContainer className="flex-1 mr-2">
+                <FInputField
+                  label="Produto"
+                  placeholder="Buscar por produto"
+                  value={filtros.produto}
+                  onChangeText={(text) =>
+                    setFiltros((prev) => ({ ...prev, produto: text }))
+                  }
+                  className="mb-2"
+                />
+              </FContainer>
+              <FContainer className="flex-1">
+                <FInputField
+                  label="Cooperado"
+                  placeholder="Buscar por cooperado"
+                  value={filtros.cooperado}
+                  onChangeText={(text) =>
+                    setFiltros((prev) => ({ ...prev, cooperado: text }))
+                  }
+                  className="mb-2"
+                />
+              </FContainer>
+            </FContainer>
+
+            <FButton
+              variant="secondary"
+              size="small"
+              onPress={limparFiltros}
+              className="self-end"
+            >
+              🗑️ Limpar Filtros
+            </FButton>
+          </FContainer>
+
+          {/* Resumo das Vendas */}
+          <FContainer className="mb-4 p-3 bg-success-50 rounded-lg border border-success-200">
+            <FContainer className="flex-row justify-between items-center mb-2">
+              <FText variant="body" color="primary" className="font-bold">
+                💰 Total em Vendas
+              </FText>
+              <FText variant="title" className="text-success-600 font-bold">
+                R$ {calcularTotalVendas().toFixed(2)}
+              </FText>
+            </FContainer>
+
+            <FContainer className="flex-row justify-between items-center">
+              <FText variant="caption" color="secondary">
+                📦 {calcularQuantidadeTotal()} unidades vendidas
+              </FText>
+              <FText variant="caption" color="secondary">
+                🛒 {vendasFiltradas.length} vendas encontradas
+              </FText>
+            </FContainer>
+          </FContainer>
+
+          <ScrollView className="max-h-80">
+            {vendasFiltradas.length === 0 ? (
               <FContainer className="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
                 <FText variant="body" color="secondary" className="text-center">
-                  📝 Nenhuma venda registrada ainda
+                  {vendas.length === 0
+                    ? "📝 Nenhuma venda registrada ainda"
+                    : "🔍 Nenhuma venda encontrada com os filtros aplicados"}
                 </FText>
               </FContainer>
             ) : (
-              vendas.map((venda, index) => (
+              vendasFiltradas.map((venda, index) => (
                 <FContainer
                   key={venda.id || index}
-                  className="mb-3 p-3 bg-white rounded-lg border border-neutral-200 shadow-sm"
+                  className="mb-3 p-4 bg-white rounded-lg border border-neutral-200 shadow-sm"
                 >
-                  <FContainer className="flex-row justify-between items-center mb-2">
-                    <FText variant="body" color="primary" className="font-bold">
-                      🛒 {venda.produto}
-                    </FText>
+                  <FContainer className="flex-row justify-between items-center mb-3">
+                    <FContainer className="flex-row items-center">
+                      <FText
+                        variant="body"
+                        color="primary"
+                        className="font-bold mr-2"
+                      >
+                        🛒 {venda.produto}
+                      </FText>
+                      <FContainer className="px-2 py-1 bg-success-100 rounded">
+                        <FText
+                          variant="caption"
+                          className="text-success-700 font-bold"
+                        >
+                          #{venda.id || index + 1}
+                        </FText>
+                      </FContainer>
+                    </FContainer>
                     <FText
-                      variant="caption"
+                      variant="title"
                       className="text-success-600 font-bold"
                     >
                       R${" "}
@@ -389,24 +535,41 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
                   </FContainer>
 
                   <FContainer className="flex-row justify-between items-center mb-2">
-                    <FText variant="caption" color="secondary">
-                      👤 {venda.cooperado}
-                    </FText>
-                    <FText variant="caption" color="secondary">
-                      📦 {venda.quantidade} unidades
-                    </FText>
-                  </FContainer>
-
-                  <FContainer className="flex-row justify-between items-center">
+                    <FContainer className="flex-row items-center">
+                      <FText
+                        variant="caption"
+                        color="secondary"
+                        className="mr-4"
+                      >
+                        👤 {venda.cooperado}
+                      </FText>
+                      <FText variant="caption" color="secondary">
+                        📦 {venda.quantidade} unidades
+                      </FText>
+                    </FContainer>
                     <FText variant="caption" color="secondary">
                       🕐{" "}
                       {venda.data_venda
                         ? formatDate(venda.data_venda)
                         : "Data não informada"}
                     </FText>
-                    <FText variant="caption" className="text-success-600">
-                      #{venda.id || index + 1}
+                  </FContainer>
+
+                  <FContainer className="flex-row justify-between items-center">
+                    <FText variant="caption" className="text-brand-600">
+                      💵 Valor unitário: R${" "}
+                      {venda.quantidade > 0
+                        ? (venda.valor / venda.quantidade).toFixed(2)
+                        : "0,00"}
                     </FText>
+                    <FContainer className="px-2 py-1 bg-brand-50 rounded">
+                      <FText
+                        variant="caption"
+                        className="text-brand-700 font-bold"
+                      >
+                        ✅ Concluída
+                      </FText>
+                    </FContainer>
                   </FContainer>
                 </FContainer>
               ))

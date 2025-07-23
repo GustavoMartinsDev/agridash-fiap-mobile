@@ -127,7 +127,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
 
   if (loading) {
     return (
-      <DashboardTemplate title="Dashboard Farm Fiap" onLogout={onLogout}>
+      <DashboardTemplate title="Dashboard AgriDash" onLogout={onLogout}>
         <FContainer className="flex-1 justify-center items-center">
           <FText variant="title" color="primary">
             Carregando...
@@ -138,7 +138,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
   }
 
   return (
-    <DashboardTemplate title="Dashboard Farm Fiap" onLogout={onLogout}>
+    <DashboardTemplate title="Dashboard AgriDash" onLogout={onLogout}>
       <FContainer className="flex-row mb-4">
         <FButton
           variant={activeTab === "vendas" ? "primary" : "secondary"}

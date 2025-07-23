@@ -84,11 +84,22 @@ export const FStockForm: React.FC<FStockFormProps> = ({
     setLoading(true);
 
     try {
+      const novoStatus = getStatusText(
+        novaQuantidade,
+        estoqueSelecionado.capacidade_estoque
+      );
+
       await estoqueService.atualizarEstoque(
         estoqueSelecionado.id,
         novaQuantidade
       );
-      Alert.alert("Sucesso", "Quantidade atualizada com sucesso!");
+
+      await estoqueService.atualizarStatusEstoque(
+        estoqueSelecionado.id,
+        novoStatus
+      );
+
+      Alert.alert("Sucesso", "Quantidade e status atualizados com sucesso!");
 
       await loadProdutosEstoque();
 
@@ -217,7 +228,10 @@ export const FStockForm: React.FC<FStockFormProps> = ({
                   %
                 </FText>
                 <FText variant="caption" color="secondary">
-                  🏷️ Status: {estoque.status_estoque}
+                  {estoque.valor_unitario_venda.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
                 </FText>
               </FContainer>
             </FContainer>

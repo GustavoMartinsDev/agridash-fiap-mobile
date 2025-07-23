@@ -73,6 +73,13 @@ export const estoqueService = {
       quantidade_estoque: novaQuantidade,
     });
   },
+
+  async atualizarStatusEstoque(id: string, novoStatus: string): Promise<void> {
+    const estoqueRef = doc(db, "estoque", id);
+    await updateDoc(estoqueRef, {
+      status_estoque: novoStatus,
+    });
+  },
 };
 
 export const vendasService = {
