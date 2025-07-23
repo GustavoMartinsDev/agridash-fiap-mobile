@@ -3,7 +3,7 @@ import { FContainer, FText } from "../../atoms";
 import { BaseComponentProps } from "../../../types";
 
 export interface FHeaderProps extends BaseComponentProps {
-  title: string;
+  title: string | React.ReactNode;
   subtitle?: string;
   rightComponent?: React.ReactNode;
 }
@@ -19,9 +19,13 @@ export const FHeader: React.FC<FHeaderProps> = ({
       className={`flex-row items-center justify-between mb-2 ${className}`}
     >
       <FContainer>
-        <FText variant="title" color="primary" className="mb-0 self-start">
-          {title}
-        </FText>
+        {typeof title === "string" ? (
+          <FText variant="title" color="primary" className="mb-0 self-start">
+            {title}
+          </FText>
+        ) : (
+          title
+        )}
         {subtitle && (
           <FText variant="subtitle" color="secondary">
             {subtitle}

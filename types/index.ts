@@ -80,7 +80,7 @@ export interface NavigationProps {
   onLogout?: () => void;
 }
 
-export type ButtonVariant = "primary" | "secondary" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "danger" | "success";
 export type ButtonSize = "small" | "medium" | "large";
 
 export type InputType = "text" | "email" | "password" | "number";

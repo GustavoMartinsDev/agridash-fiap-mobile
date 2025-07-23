@@ -149,13 +149,13 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
       />
 
       <FButton
-        variant="primary"
+        variant="success"
         size="medium"
         fullWidth
         onPress={handleSubmit}
         disabled={!isFormValid()}
         loading={loading || externalLoading}
-        className="mb-4"
+        className="mb-4 success"
       >
         Entrar
       </FButton>

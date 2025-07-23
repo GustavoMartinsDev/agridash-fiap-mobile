@@ -189,7 +189,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
       />
 
       <FButton
-        variant="primary"
+        variant="success"
         size="medium"
         fullWidth
         onPress={handleSubmit}

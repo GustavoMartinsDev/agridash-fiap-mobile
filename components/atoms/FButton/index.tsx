@@ -17,19 +17,11 @@ export interface FButtonProps
   children: React.ReactNode;
 }
 
-const variantClasses = {
-  primary: "bg-farm-green-800",
-  secondary: "bg-farm-amber-400",
-  danger: "bg-farm-red-600",
-};
-
 const sizeClasses = {
   small: "h-10 px-4",
   medium: "h-12 px-6",
   large: "h-14 px-8",
 };
-
-const disabledClasses = "bg-farm-amber-400 opacity-60";
 
 export const FButton: React.FC<FButtonProps> = ({
   variant = "primary",
@@ -44,10 +36,10 @@ export const FButton: React.FC<FButtonProps> = ({
   const isDisabled = disabled || loading;
 
   const classes = `
-    ${variantClasses[variant]} 
+    bg-${variant}-500
     ${sizeClasses[size]} 
     ${fullWidth ? "w-full" : ""} 
-    ${isDisabled ? disabledClasses : ""} 
+    ${isDisabled ? `bg-${variant}-200` : ""} 
     rounded-lg items-center justify-center 
     ${className}
   `.trim();

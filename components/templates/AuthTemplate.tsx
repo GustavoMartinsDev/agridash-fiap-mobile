@@ -5,7 +5,7 @@ import { Header } from "../molecules";
 import { BaseComponentProps } from "../../types";
 
 export interface AuthTemplateProps extends BaseComponentProps {
-  title: string;
+  title: string | React.ReactNode;
   subtitle: string;
   children: React.ReactNode;
 }
