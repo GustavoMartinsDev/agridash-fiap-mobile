@@ -11,6 +11,7 @@ export interface FSelectOption {
 export interface FSelectProps extends BaseComponentProps {
   options: FSelectOption[];
   value?: string;
+  label?: string;
   placeholder?: string;
   onSelect: (value: string) => void;
   error?: string;
@@ -18,6 +19,7 @@ export interface FSelectProps extends BaseComponentProps {
 
 export const FSelect: React.FC<FSelectProps> = ({
   options,
+  label = "",
   value,
   placeholder = "Selecione...",
   onSelect,
@@ -29,6 +31,7 @@ export const FSelect: React.FC<FSelectProps> = ({
 
   return (
     <FContainer className={className}>
+      {label! && <FText color="secondary">{label}</FText>}
       <TouchableOpacity
         onPress={() => setIsOpen(!isOpen)}
         className={`border border-farm-green-200 rounded-lg p-3 ${

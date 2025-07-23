@@ -17,10 +17,10 @@ const variantClasses = {
 };
 
 const colorClasses = {
-  primary: "text-farm-green-800",
-  secondary: "text-farm-amber-700",
-  error: "text-farm-red-600",
-  success: "text-green-600",
+  primary: "text-success-800",
+  secondary: "text-neutral-600",
+  error: "text-danger-600",
+  success: "text-success-600",
   white: "text-white",
 };
 

@@ -24,7 +24,7 @@ const sizeClasses = {
 };
 
 export const FButton: React.FC<FButtonProps> = ({
-  variant,
+  variant = "primary",
   size = "medium",
   loading = false,
   fullWidth = false,
@@ -36,10 +36,10 @@ export const FButton: React.FC<FButtonProps> = ({
   const isDisabled = disabled || loading;
 
   const classes = `
-    ${"bg-" + variant + "-500"}
+    bg-${variant}-500
     ${sizeClasses[size]} 
     ${fullWidth ? "w-full" : ""} 
-    ${isDisabled ? `bg-${"bg-" + variant + "-200"}` : ""} 
+    ${isDisabled ? `bg-${variant}-200` : ""} 
     rounded-lg items-center justify-center 
     ${className}
   `.trim();

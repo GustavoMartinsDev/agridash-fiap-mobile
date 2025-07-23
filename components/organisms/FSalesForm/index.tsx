@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
-import { FContainer, FButton, FSelect, FSelectOption } from "../../atoms";
+import {
+  FContainer,
+  FButton,
+  FSelect,
+  FSelectOption,
+  FText,
+} from "../../atoms";
 import { FInputField } from "../../molecules";
 import {
   VendaData,
@@ -150,7 +156,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
 
   const cooperadoOptions: FSelectOption[] = cooperados.map((c) => ({
     label: `${c.nome}`,
-    value: c.id,
+    value: c.nome,
   }));
 
   return (
@@ -159,18 +165,11 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       padding="medium"
       className={`rounded-lg shadow-sm ${className}`}
     >
-      <FSelect
-        options={produtoOptions}
-        value={formData.produto}
-        placeholder="Selecione o produto"
-        onSelect={(value) =>
-          setFormData((prev) => ({ ...prev, produto: value }))
-        }
-        className="mb-2"
-      />
-
       {estoque && (
-        <FContainer className="mb-2 p-2 bg-farm-green-50 rounded">
+        <FContainer className="mb-2 p-2 bg-success-50 rounded border border-neutral-200">
+          <FText color="secondary" className="w-full">
+            Estoque Atual
+          </FText>
           <FInputField
             label="Produto Selecionado"
             value={formData.produto}
@@ -191,7 +190,19 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
         </FContainer>
       )}
 
+      <FSelect
+        options={produtoOptions}
+        value={formData.produto}
+        label="Produto"
+        placeholder="Selecione o produto"
+        onSelect={(value) =>
+          setFormData((prev) => ({ ...prev, produto: value }))
+        }
+        className="mb-2"
+      />
+
       <FInputField
+        label="Quantidade"
         type="number"
         placeholder="Quantidade"
         value={formData.quantidade}
@@ -202,11 +213,12 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       />
 
       {valor > 0 && (
-        <FContainer className="mb-2 p-2 bg-farm-amber-50 rounded">
+        <FContainer className="mb-2 p-2 bg-warning-50 rounded">
           <FInputField
             label="Valor da Venda"
             value={`R$ ${valor.toFixed(2)}`}
             editable={false}
+            aria-disabled
           />
         </FContainer>
       )}
@@ -222,7 +234,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       />
 
       <FButton
-        variant="primary"
+        variant="success"
         size="medium"
         fullWidth
         onPress={handleSubmit}

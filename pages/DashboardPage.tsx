@@ -78,8 +78,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
 
   const estoqueData = (): ChartData[] => {
     return estoque.map((item) => ({
-      value: item.quantidade,
-      label: item.produto,
+      value: item.quantidade_estoque,
+      label: item.nome_produto,
       frontColor: "#4e7934",
     }));
   };
@@ -121,7 +121,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
   const handleNovoEstoque = (novoEstoque: Estoque) => {
     setEstoque((prev) => [
       novoEstoque,
-      ...prev.filter((e) => e.produto !== novoEstoque.produto),
+      ...prev.filter((e) => e.nome_produto !== novoEstoque.nome_produto),
     ]);
   };
 
@@ -144,7 +144,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
           variant={activeTab === "vendas" ? "primary" : "secondary"}
           size="medium"
           onPress={() => setActiveTab("vendas")}
-          className="flex-1 mr-2"
+          className="flex-1 mr-2 bg-farm-green-200"
         >
           Vendas
         </FButton>
@@ -158,7 +158,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
         </FButton>
       </FContainer>
 
-      <Section title="Vendas por Mês">
+      {/* <Section title="Vendas por Mês">
         <FChartContainer>
           <LineChart
             data={vendasPorMes()}
@@ -193,9 +193,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
             yAxisTextStyle={{ color: "#7c6f57" }}
           />
         </FChartContainer>
-      </Section>
+      </Section> */}
 
-      <Section title="Categorias de Produtos">
+      {/* <Section title="Categorias de Produtos">
         <FChartContainer>
           <PieChart
             data={categoriasData()}
@@ -211,7 +211,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
             )}
           />
         </FChartContainer>
-      </Section>
+      </Section> */}
 
       {activeTab === "vendas" ? (
         <>
@@ -229,7 +229,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
             <FStockForm onSubmit={handleNovoEstoque} className="mb-4" />
           </Section>
 
-          <Section title="Estoque Atual">
+          {/* <Section title="Estoque Atual">
             <FContainer>
               {estoque.map((item, index) => (
                 <FContainer
@@ -249,7 +249,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
                 </FContainer>
               ))}
             </FContainer>
-          </Section>
+          </Section> */}
         </>
       )}
     </DashboardTemplate>
