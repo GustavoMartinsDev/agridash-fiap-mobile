@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, ScrollView } from "react-native";
 import { FContainer, FInput, FButton, FText, FSelect } from "../../atoms";
 import { estoqueService, produtosService } from "../../../services/firebase";
 import type { Produto, Estoque } from "../../../types";
@@ -23,93 +23,130 @@ export const FStockForm: React.FC<FStockFormProps> = ({
   const [formData, setFormData] = useState({
     produto: "",
     quantidade: "",
-    capacidade: "",
   });
   const [loading, setLoading] = useState(false);
-  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [produtosEstoque, setProdutosEstoque] = useState<Estoque[]>([]);
+  const [estoqueSelecionado, setEstoqueSelecionado] = useState<Estoque | null>(
+    null
+  );
 
   useEffect(() => {
-    const loadProdutos = async () => {
-      try {
-        const produtosList = await produtosService.getProdutos();
-        setProdutos(produtosList);
-      } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-        Alert.alert("Erro", "Não foi possível carregar os produtos");
-      }
-    };
-
-    loadProdutos();
+    loadProdutosEstoque();
   }, []);
 
-  useEffect(() => {
-    if (editData) {
-      setFormData({
-        produto: editData.produto,
-        quantidade: editData.quantidade.toString(),
-        capacidade: editData.capacidade.toString(),
-      });
+  const loadProdutosEstoque = async () => {
+    try {
+      const estoqueData = await estoqueService.getEstoque();
+      setProdutosEstoque(estoqueData);
+    } catch (error) {
+      console.error("Erro ao carregar estoque:", error);
+      Alert.alert("Erro", "Não foi possível carregar o estoque");
     }
-  }, [editData]);
+  };
 
-  const resetForm = () => {
+  const handleProdutoSelect = (nomeProduto: string) => {
+    const estoque = produtosEstoque.find((e) => e.nome_produto === nomeProduto);
+    setEstoqueSelecionado(estoque || null);
     setFormData({
-      produto: "",
-      quantidade: "",
-      capacidade: "",
+      produto: nomeProduto,
+      quantidade: estoque ? estoque.quantidade_estoque.toString() : "",
     });
   };
 
   const handleSubmit = async () => {
-    if (!isFormValid()) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
+    if (!formData.produto || !formData.quantidade) {
+      Alert.alert(
+        "Erro",
+        "Por favor, selecione um produto e informe a quantidade"
+      );
       return;
     }
 
-    if (parseInt(formData.quantidade) > parseInt(formData.capacidade)) {
-      Alert.alert("Erro", "A quantidade não pode ser maior que a capacidade");
+    if (!estoqueSelecionado) {
+      Alert.alert("Erro", "Produto não encontrado no estoque");
+      return;
+    }
+
+    const novaQuantidade = parseInt(formData.quantidade);
+    if (novaQuantidade < 0) {
+      Alert.alert("Erro", "A quantidade não pode ser negativa");
+      return;
+    }
+
+    if (novaQuantidade > estoqueSelecionado.capacidade_estoque) {
+      Alert.alert(
+        "Erro",
+        "A quantidade não pode ser maior que a capacidade máxima"
+      );
       return;
     }
 
     setLoading(true);
 
     try {
-      if (editData?.id) {
-        await estoqueService.atualizarEstoque(
-          editData.id,
-          parseInt(formData.quantidade)
-        );
-        Alert.alert("Sucesso", "Estoque atualizado com sucesso!");
-      } else {
-        await estoqueService.adicionarEstoque(
-          formData.produto,
-          parseInt(formData.quantidade)
-        );
-        Alert.alert("Sucesso", "Estoque criado com sucesso!");
-      }
+      await estoqueService.atualizarEstoque(
+        estoqueSelecionado.id,
+        novaQuantidade
+      );
+      Alert.alert("Sucesso", "Quantidade atualizada com sucesso!");
 
-      if (!editData) {
-        resetForm();
+      await loadProdutosEstoque();
+
+      const estoqueAtualizado = await estoqueService.getEstoquePorProduto(
+        formData.produto
+      );
+      setEstoqueSelecionado(estoqueAtualizado);
+      setFormData((prev) => ({
+        ...prev,
+        quantidade: estoqueAtualizado
+          ? estoqueAtualizado.quantidade_estoque.toString()
+          : "",
+      }));
+
+      if (estoqueAtualizado) {
+        onSubmit?.(estoqueAtualizado);
       }
     } catch (error) {
-      console.error("Erro ao salvar estoque:", error);
-      Alert.alert("Erro", "Não foi possível salvar o estoque");
+      console.error("Erro ao atualizar estoque:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o estoque");
     } finally {
       setLoading(false);
     }
   };
 
-  const isFormValid = () => {
-    const { produto, quantidade, capacidade } = formData;
-    return produto && quantidade && capacidade;
+  const resetForm = () => {
+    setFormData({
+      produto: "",
+      quantidade: "",
+    });
+    setEstoqueSelecionado(null);
   };
 
-  const produtoOptions: FSelectOption[] = produtos.map((p) => ({
-    label: p.nome,
-    value: p.nome,
+  const produtoOptions: FSelectOption[] = produtosEstoque.map((estoque) => ({
+    label: estoque.nome_produto,
+    value: estoque.nome_produto,
   }));
 
-  const produtoSelecionado = produtos.find((p) => p.nome === formData.produto);
+  const getStatusColor = (quantidade: number, capacidade: number) => {
+    const percentual = (quantidade / capacidade) * 100;
+    if (percentual <= 20) return "text-danger-600";
+    if (percentual <= 50) return "text-warning-600";
+    return "text-success-600";
+  };
+
+  const getStatusText = (quantidade: number, capacidade: number) => {
+    const percentual = (quantidade / capacidade) * 100;
+    if (percentual <= 20) return "Crítico";
+    if (percentual <= 50) return "Baixo";
+    return "Normal";
+  };
+
+  const getStatusBgColor = (quantidade: number, capacidade: number) => {
+    const percentual = (quantidade / capacidade) * 100;
+    if (percentual <= 20) return "bg-danger-50 border-danger-200";
+    if (percentual <= 50) return "bg-warning-50 border-warning-200";
+    return "bg-success-50 border-success-200";
+  };
 
   return (
     <FContainer
@@ -117,97 +154,181 @@ export const FStockForm: React.FC<FStockFormProps> = ({
       padding="medium"
       className={`rounded-lg shadow-sm ${className}`}
     >
-      <FText variant="title" color="primary" className="mb-4 text-center">
-        {editData ? "Editar Estoque" : "Cadastrar Estoque"}
+      <FText variant="title" color="primary" className="mb-4">
+        Gerenciar Estoque
       </FText>
 
+      {/* Lista de Produtos em Estoque */}
+      <FText variant="subtitle" color="primary" className="mb-3">
+        📊 Produtos em Estoque ({produtosEstoque.length} produtos)
+      </FText>
+
+      <ScrollView className="max-h-60 mb-4">
+        {produtosEstoque.length === 0 ? (
+          <FContainer className="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+            <FText variant="body" color="secondary" className="text-center">
+              📝 Nenhum produto cadastrado ainda
+            </FText>
+          </FContainer>
+        ) : (
+          produtosEstoque.map((estoque, index) => (
+            <FContainer
+              key={estoque.id}
+              className={`mb-3 p-3 rounded-lg border shadow-sm ${
+                estoqueSelecionado?.id === estoque.id
+                  ? getStatusBgColor(
+                      estoque.quantidade_estoque,
+                      estoque.capacidade_estoque
+                    )
+                  : "bg-white border-neutral-200"
+              }`}
+            >
+              <FContainer className="flex-row justify-between items-center mb-2">
+                <FText variant="body" color="primary" className="font-bold">
+                  📦 {estoque.nome_produto}
+                </FText>
+                <FText
+                  variant="caption"
+                  className={`font-bold ${getStatusColor(estoque.quantidade_estoque, estoque.capacidade_estoque)}`}
+                >
+                  {getStatusText(
+                    estoque.quantidade_estoque,
+                    estoque.capacidade_estoque
+                  )}
+                </FText>
+              </FContainer>
+
+              <FContainer className="flex-row justify-between items-center mb-2">
+                <FText variant="caption" color="secondary">
+                  📊 Quantidade: {estoque.quantidade_estoque}
+                </FText>
+                <FText variant="caption" color="secondary">
+                  🏭 Capacidade: {estoque.capacidade_estoque}
+                </FText>
+              </FContainer>
+
+              <FContainer className="flex-row justify-between items-center">
+                <FText variant="caption" color="secondary">
+                  📈 Ocupação:{" "}
+                  {(
+                    (estoque.quantidade_estoque / estoque.capacidade_estoque) *
+                    100
+                  ).toFixed(1)}
+                  %
+                </FText>
+                <FText variant="caption" color="secondary">
+                  🏷️ Status: {estoque.status_estoque}
+                </FText>
+              </FContainer>
+            </FContainer>
+          ))
+        )}
+      </ScrollView>
+
+      {/* Produto Selecionado */}
+      {estoqueSelecionado && (
+        <FContainer
+          className={`mb-4 p-3 rounded-lg border ${getStatusBgColor(estoqueSelecionado.quantidade_estoque, estoqueSelecionado.capacidade_estoque)}`}
+        >
+          <FContainer className="flex-row justify-between items-center mb-2">
+            <FText variant="subtitle" color="primary" className="font-bold">
+              � {estoqueSelecionado.nome_produto}
+            </FText>
+            <FText
+              variant="caption"
+              className={`font-bold ${getStatusColor(estoqueSelecionado.quantidade_estoque, estoqueSelecionado.capacidade_estoque)}`}
+            >
+              {getStatusText(
+                estoqueSelecionado.quantidade_estoque,
+                estoqueSelecionado.capacidade_estoque
+              )}
+            </FText>
+          </FContainer>
+
+          <FContainer className="flex-row justify-between mb-2">
+            <FText variant="caption" color="secondary">
+              Atual: {estoqueSelecionado.quantidade_estoque} unidades
+            </FText>
+            <FText variant="caption" color="secondary">
+              Capacidade: {estoqueSelecionado.capacidade_estoque} unidades
+            </FText>
+          </FContainer>
+
+          <FContainer className="flex-row justify-between">
+            <FText variant="caption" color="secondary">
+              Ocupação:{" "}
+              {(
+                (estoqueSelecionado.quantidade_estoque /
+                  estoqueSelecionado.capacidade_estoque) *
+                100
+              ).toFixed(1)}
+              %
+            </FText>
+            <FText variant="caption" color="secondary">
+              Status: {estoqueSelecionado.status_estoque}
+            </FText>
+          </FContainer>
+        </FContainer>
+      )}
+
+      {/* Formulário de Edição */}
       <FSelect
         options={produtoOptions}
         value={formData.produto}
         placeholder="Selecione o produto"
-        onSelect={(value) =>
-          setFormData((prev) => ({ ...prev, produto: value }))
-        }
-        className="mb-2"
+        onSelect={handleProdutoSelect}
+        className="mb-3"
       />
-
-      {produtoSelecionado && (
-        <FContainer className="mb-2 p-2 bg-farm-green-50 rounded">
-          <FText variant="caption" color="secondary" className="mb-1">
-            Código do Produto
-          </FText>
-          <FInput
-            value={produtoSelecionado.codigo}
-            editable={false}
-            className="mb-2"
-          />
-          <FText variant="caption" color="secondary" className="mb-1">
-            Preço por Unidade
-          </FText>
-          <FInput
-            value={`R$ ${produtoSelecionado.preco.toFixed(2)}`}
-            editable={false}
-          />
-        </FContainer>
-      )}
 
       <FInput
         type="number"
-        placeholder="Quantidade atual"
+        placeholder="Nova quantidade"
         value={formData.quantidade}
         onChangeText={(text: string) =>
           setFormData((prev) => ({ ...prev, quantidade: text }))
         }
-        className="mb-2"
+        className="mb-3"
       />
 
-      <FInput
-        type="number"
-        placeholder="Capacidade máxima"
-        value={formData.capacidade}
-        onChangeText={(text: string) =>
-          setFormData((prev) => ({ ...prev, capacidade: text }))
-        }
-        className="mb-2"
-      />
-
-      {formData.quantidade && formData.capacidade && (
-        <FContainer className="mb-2 p-2 bg-farm-amber-50 rounded">
-          <FText variant="body" color="primary" className="text-center">
-            Ocupação:{" "}
-            {(
-              (parseInt(formData.quantidade || "0") /
-                parseInt(formData.capacidade || "1")) *
-              100
-            ).toFixed(1)}
-            %
-          </FText>
+      {formData.quantidade && estoqueSelecionado && (
+        <FContainer className="mb-3 p-3 bg-success-50 rounded-lg border border-success-200">
+          <FContainer className="flex-row justify-between items-center">
+            <FText variant="body" color="primary" className="font-bold">
+              � Nova Ocupação
+            </FText>
+            <FText variant="title" className="text-success-600 font-bold">
+              {(
+                (parseInt(formData.quantidade || "0") /
+                  estoqueSelecionado.capacidade_estoque) *
+                100
+              ).toFixed(1)}
+              %
+            </FText>
+          </FContainer>
         </FContainer>
       )}
 
       <FButton
-        variant="primary"
+        variant="success"
         size="medium"
         fullWidth
         onPress={handleSubmit}
-        disabled={!isFormValid()}
+        disabled={!formData.produto || !formData.quantidade}
         loading={loading}
         className="mt-2"
       >
-        {editData ? "Atualizar" : "Cadastrar"}
+        ✅ Atualizar Quantidade
       </FButton>
 
-      {editData && (
-        <FButton
-          variant="secondary"
-          size="medium"
-          fullWidth
-          onPress={resetForm}
-          className="mt-2"
-        >
-          Limpar
-        </FButton>
-      )}
+      <FButton
+        variant="secondary"
+        size="medium"
+        fullWidth
+        onPress={resetForm}
+        className="mt-2"
+      >
+        🔄 Limpar Seleção
+      </FButton>
     </FContainer>
   );
 };
