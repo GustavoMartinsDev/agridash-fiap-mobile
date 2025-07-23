@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       colors: {
         "farm-green": {
-          50: "#e6f2d6", // bg-green-100
+          50: "#e3e5e9", // bg-green-100
           800: "#4e7934", // text-green-800
         },
         "farm-amber": {
@@ -18,7 +18,6 @@ module.exports = {
           600: "#c0392b", // border-red-600
         },
         "bg-primary": "#e3e5e9",
-        // Success (Verde)
         success: {
           50: "#f0fdf4",
           100: "#dcfce7",
@@ -31,7 +30,6 @@ module.exports = {
           800: "#166534",
           900: "#14532d",
         },
-        // Brand (Azul)
         brand: {
           50: "#f0f9ff",
           100: "#e0f2fe",
