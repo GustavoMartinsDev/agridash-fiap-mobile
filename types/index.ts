@@ -13,6 +13,13 @@ export interface ValidationState {
   emailValido: boolean;
   senhaValida: boolean;
   senhasIguais?: boolean;
+  senhaDetalhes?: {
+    comprimento: boolean;
+    maiuscula: boolean;
+    minuscula: boolean;
+    numero: boolean;
+    especial: boolean;
+  };
 }
 
 export interface VendaData {

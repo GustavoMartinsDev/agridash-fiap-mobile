@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { AuthTemplate, LoginForm } from "../components";
 import { NavigationProps } from "../types";
@@ -11,26 +11,54 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   irParaDashboard,
 }) => {
   return (
-    <AuthTemplate
-      title={
-        <LinearGradient
-          colors={["#16a34a", "#0284c7"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ borderRadius: 8, padding: 4 }}
-        >
-          <Text className="text-6xl font-extrabold text-center text-white">
-            AgriDash
-          </Text>
-        </LinearGradient>
-      }
-      subtitle="Gestão de Cooperativas Agrícolas"
-      className="bg-bg-primary"
-    >
-      <LoginForm
-        irParaRegister={irParaRegister}
-        irParaDashboard={irParaDashboard}
+    <View style={{ flex: 1 }}>
+      {/* Background gradiente para toda a tela */}
+      <LinearGradient
+        colors={["#f0f9ff", "#e0f2fe", "#bae6fd"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
       />
-    </AuthTemplate>
+
+      <AuthTemplate
+        title={
+          <View style={{ marginBottom: 8 }}>
+            <LinearGradient
+              colors={["#16a34a", "#0284c7"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                borderRadius: 16,
+                padding: 12,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.3,
+                shadowRadius: 16,
+                elevation: 12,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 48,
+                  fontWeight: "900",
+                  textAlign: "center",
+                  color: "white",
+                  letterSpacing: 1,
+                }}
+              >
+                AgriDash
+              </Text>
+            </LinearGradient>
+          </View>
+        }
+        subtitle="🌱 Gestão de Cooperativas Agrícolas"
+        className="bg-transparent"
+      >
+        <LoginForm
+          irParaRegister={irParaRegister}
+          irParaDashboard={irParaDashboard}
+        />
+      </AuthTemplate>
+    </View>
   );
 };

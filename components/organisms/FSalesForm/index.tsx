@@ -272,9 +272,9 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
 
   const getStatusText = (quantidade: number, capacidade: number) => {
     const percentual = (quantidade / capacidade) * 100;
-    if (percentual <= 20) return "Crítico";
-    if (percentual <= 50) return "Baixo";
-    return "Normal";
+    if (percentual <= 20) return "Baixo";
+    if (percentual <= 80) return "Médio";
+    return "Alto";
   };
 
   const getStatusBgColor = (quantidade: number, capacidade: number) => {

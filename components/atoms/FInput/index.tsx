@@ -9,6 +9,7 @@ export interface FInputProps extends RNTextInputProps, BaseComponentProps {
   type?: InputType;
   state?: InputState;
   fullWidth?: boolean;
+  hasRightIcon?: boolean;
 }
 
 const stateClasses = {
@@ -21,12 +22,14 @@ export const FInput: React.FC<FInputProps> = ({
   type = "text",
   state = "default",
   fullWidth = true,
+  hasRightIcon = false,
   className = "",
   ...props
 }) => {
   const classes = `
     ${fullWidth ? "w-full" : ""} 
-    h-12 bg-white border rounded-lg px-4 text-base text-farm-green-800 
+    h-12 bg-white border rounded-lg text-base text-farm-green-800 
+    ${hasRightIcon ? "pl-4 pr-12" : "px-4"}
     ${stateClasses[state]} 
     ${className}
   `.trim();
