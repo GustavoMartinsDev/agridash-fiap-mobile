@@ -9,6 +9,7 @@ import {
   onSnapshot,
   Unsubscribe,
   writeBatch,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
@@ -129,6 +130,43 @@ class NotificacaoService {
     }
 
     await batch.commit();
+  }
+
+  async criarNotificacao(
+    titulo: string,
+    mensagem: string,
+    usuarioId: string,
+    tipo: string = "estoque"
+  ): Promise<void> {
+    try {
+      // Buscar o último ID para criar um auto incremento
+      const q = query(this.collection, orderBy("id", "desc"));
+      const querySnapshot = await getDocs(q);
+
+      let novoId = 1;
+      if (!querySnapshot.empty) {
+        const ultimaNotificacao = querySnapshot.docs[0].data() as Notificacao;
+        novoId = (ultimaNotificacao.id || 0) + 1;
+      }
+
+      const novaNotificacao: Omit<
+        Notificacao,
+        "idUsuarioLeitura" | "dataLeitura"
+      > = {
+        id: novoId,
+        titulo,
+        mensagem,
+        lida: false,
+        dataCriacao: new Date().toISOString(),
+        idUsuario: usuarioId,
+        tipo,
+      };
+
+      await addDoc(this.collection, novaNotificacao);
+    } catch (error) {
+      console.error("Erro ao criar notificação:", error);
+      throw new Error("Não foi possível criar a notificação");
+    }
   }
 }
 

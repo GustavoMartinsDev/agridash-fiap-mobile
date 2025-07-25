@@ -159,7 +159,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
       {activeTab === "vendas" ? (
         <>
           <Section title="Registrar Venda">
-            <FSalesForm onSubmit={handleNovaVenda} className="mb-4 border" />
+            <FSalesForm
+              onSubmit={handleNovaVenda}
+              className="mb-4 border"
+              usuarioId={user?.uid}
+            />
           </Section>
 
           <Section title="Histórico de Vendas">
@@ -169,7 +173,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
       ) : (
         <>
           <Section title="Gerenciar Estoque">
-            <FStockForm onSubmit={handleNovoEstoque} className="mb-4" />
+            <FStockForm
+              onSubmit={handleNovoEstoque}
+              className="mb-4"
+              usuarioId={user?.uid}
+            />
           </Section>
         </>
       )}

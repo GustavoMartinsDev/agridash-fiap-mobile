@@ -23,12 +23,14 @@ interface FStockFormProps {
   onSubmit?: (estoque: Estoque) => void;
   editData?: Estoque | null;
   className?: string;
+  usuarioId?: string;
 }
 
 export const FStockForm: React.FC<FStockFormProps> = ({
   onSubmit,
   editData,
   className = "",
+  usuarioId,
 }) => {
   const [formData, setFormData] = useState({
     produto: "",
@@ -114,7 +116,8 @@ export const FStockForm: React.FC<FStockFormProps> = ({
 
       await estoqueService.atualizarEstoque(
         estoqueSelecionado.id,
-        novaQuantidade
+        novaQuantidade,
+        usuarioId
       );
 
       await estoqueService.atualizarStatusEstoque(

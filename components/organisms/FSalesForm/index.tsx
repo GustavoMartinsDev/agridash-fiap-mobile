@@ -28,12 +28,14 @@ import {
 export interface FSalesFormProps extends BaseComponentProps {
   onSubmit?: () => void;
   loading?: boolean;
+  usuarioId?: string;
 }
 
 export const FSalesForm: React.FC<FSalesFormProps> = ({
   onSubmit,
   loading = false,
   className = "",
+  usuarioId,
 }) => {
   const [formData, setFormData] = useState({
     produto: "",
@@ -192,7 +194,11 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       await vendasService.adicionarVenda(vendaData);
 
       const novaQuantidade = estoque.quantidade_estoque - quantidadeNum;
-      await estoqueService.atualizarEstoque(estoque.id, novaQuantidade);
+      await estoqueService.atualizarEstoque(
+        estoque.id,
+        novaQuantidade,
+        usuarioId
+      );
 
       setFormData({
         produto: "",
