@@ -4,6 +4,7 @@ import {
   TextInputProps as RNTextInputProps,
 } from "react-native";
 import { BaseComponentProps, InputType, InputState } from "../../../types";
+import { theme } from "../../../ui";
 
 export interface FInputProps extends RNTextInputProps, BaseComponentProps {
   type?: InputType;
@@ -59,7 +60,7 @@ export const FInput: React.FC<FInputProps> = ({
       keyboardType={getKeyboardType()}
       secureTextEntry={getSecureTextEntry()}
       autoCapitalize={getAutoCapitalize()}
-      placeholderTextColor="#7c6f57"
+      placeholderTextColor={theme.colors.gray[600]}
       {...props}
     />
   );

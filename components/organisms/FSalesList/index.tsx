@@ -3,6 +3,7 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { FContainer, FText, FInput, FButton } from "../../atoms";
 import { VendaData, BaseComponentProps } from "../../../types";
 import { Icon } from "react-native-paper";
+import { theme } from "../../../ui";
 
 export interface FSalesListProps extends BaseComponentProps {
   vendas: VendaData[];
@@ -90,7 +91,11 @@ export const FSalesList: React.FC<FSalesListProps> = ({
 
       {filteredVendas.length === 0 ? (
         <FContainer className="p-8 items-center">
-          <Icon source="alert-circle-outline" size={48} color="#9ca3af" />
+          <Icon
+            source="alert-circle-outline"
+            size={48}
+            color={theme.colors.gray[400]}
+          />
           <FText variant="body" className="text-gray-500 mt-3 text-center">
             {searchTerm ? "Nenhuma venda encontrada" : emptyMessage}
           </FText>
@@ -110,7 +115,7 @@ export const FSalesList: React.FC<FSalesListProps> = ({
                   <Icon
                     source={getSortIcon("produto")}
                     size={16}
-                    color="#6b7280"
+                    color={theme.colors.gray[500]}
                   />
                 </TouchableOpacity>
 
@@ -124,7 +129,7 @@ export const FSalesList: React.FC<FSalesListProps> = ({
                   <Icon
                     source={getSortIcon("quantidade")}
                     size={16}
-                    color="#6b7280"
+                    color={theme.colors.gray[500]}
                   />
                 </TouchableOpacity>
 
@@ -138,7 +143,7 @@ export const FSalesList: React.FC<FSalesListProps> = ({
                   <Icon
                     source={getSortIcon("valor")}
                     size={16}
-                    color="#6b7280"
+                    color={theme.colors.gray[500]}
                   />
                 </TouchableOpacity>
               </FContainer>
@@ -187,7 +192,11 @@ export const FSalesList: React.FC<FSalesListProps> = ({
                 className={`${currentPage === 1 ? "opacity-50" : ""}`}
               >
                 <FContainer className="flex-row items-center">
-                  <Icon source="chevron-left" size={16} color="#6b7280" />
+                  <Icon
+                    source="chevron-left"
+                    size={16}
+                    color={theme.colors.gray[500]}
+                  />
                   <FText className="ml-1 text-gray-600">Anterior</FText>
                 </FContainer>
               </FButton>
@@ -231,7 +240,11 @@ export const FSalesList: React.FC<FSalesListProps> = ({
               >
                 <FContainer className="flex-row items-center">
                   <FText className="mr-1 text-gray-600">Próximo</FText>
-                  <Icon source="chevron-right" size={16} color="#6b7280" />
+                  <Icon
+                    source="chevron-right"
+                    size={16}
+                    color={theme.colors.gray[500]}
+                  />
                 </FContainer>
               </FButton>
             </FContainer>

@@ -1,5 +1,6 @@
 import { View } from "react-native";
 import { Portal, Snackbar, SnackbarProps } from "react-native-paper";
+import { theme } from "../../../ui";
 
 export enum AlertMessageColor {
   Success = "green",
@@ -15,10 +16,10 @@ export interface FAlertModel {
 }
 
 const alertMessageColors = {
-  [AlertMessageColor.Success]: "#81c784",
-  [AlertMessageColor.Error]: "#e57373",
-  [AlertMessageColor.Warning]: "#ffb74d",
-  [AlertMessageColor.Info]: "#64b5f6",
+  [AlertMessageColor.Success]: theme.colors.success[400],
+  [AlertMessageColor.Error]: theme.colors.error[400],
+  [AlertMessageColor.Warning]: theme.colors.warning[400],
+  [AlertMessageColor.Info]: theme.colors.info[400],
 };
 
 export function FAlert(props: FAlertModel) {

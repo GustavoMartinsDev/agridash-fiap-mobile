@@ -3,6 +3,7 @@ import { SafeAreaView, StatusBar, ScrollView, Platform } from "react-native";
 import { FContainer, FButton } from "../atoms";
 import { Header } from "../molecules";
 import { NavigationProps, BaseComponentProps } from "../../types";
+import { theme } from "../../ui";
 
 export interface DashboardTemplateProps
   extends NavigationProps,
@@ -23,7 +24,7 @@ export const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
     <SafeAreaView className={`flex-1 bg-farm-green-50 ${className}`}>
       <StatusBar
         barStyle={Platform.OS === "ios" ? "dark-content" : "default"}
-        backgroundColor="#e6f2d6"
+        backgroundColor={theme.colors.green[100]}
       />
       <ScrollView
         className="flex-1 bg-farm-green-50"

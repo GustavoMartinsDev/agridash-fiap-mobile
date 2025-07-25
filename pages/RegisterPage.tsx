@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { AuthTemplate, RegisterForm } from "../components";
 import { NavigationProps } from "../types";
+import { theme } from "../ui";
 
 export interface RegisterPageProps extends NavigationProps {}
 
@@ -10,7 +11,11 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ irParaLogin }) => {
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
-        colors={["#f0f9ff", "#e0f2fe", "#bae6fd"]}
+        colors={[
+          theme.colors.blue[50],
+          theme.colors.blue[100],
+          theme.colors.blue[200],
+        ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
@@ -20,13 +25,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ irParaLogin }) => {
         title={
           <View style={{ marginBottom: 8 }}>
             <LinearGradient
-              colors={["#16a34a", "#0284c7"]}
+              colors={[theme.colors.green[600], theme.colors.blue[600]]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{
                 borderRadius: 16,
                 padding: 12,
-                shadowColor: "#000",
+                shadowColor: theme.colors.black,
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.3,
                 shadowRadius: 16,

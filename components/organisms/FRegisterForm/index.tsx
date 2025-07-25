@@ -11,6 +11,7 @@ import {
 } from "../../atoms";
 import { FInputField, FLinkButton, FPasswordStrength } from "../../molecules";
 import { useAuth } from "../../../context/AuthContext";
+import { theme } from "../../../ui";
 import {
   FormData,
   ValidationState,
@@ -299,8 +300,12 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
             <LinearGradient
               colors={
                 isFormValid() && !loading && !externalLoading
-                  ? ["#16a34a", "#059669", "#0284c7"]
-                  : ["#9ca3af", "#6b7280"]
+                  ? [
+                      theme.colors.green[600],
+                      theme.colors.green[500],
+                      theme.colors.blue[600],
+                    ]
+                  : [theme.colors.gray[400], theme.colors.gray[500]]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
