@@ -37,7 +37,7 @@ export const FProductInfo: React.FC<FProductInfoProps> = ({
   const ocupacaoPercentual = (
     (produto.quantidade_estoque / produto.capacidade_estoque) *
     100
-  ).toFixed(1);
+  )?.toFixed(1);
 
   if (showOccupationOnly) {
     return (

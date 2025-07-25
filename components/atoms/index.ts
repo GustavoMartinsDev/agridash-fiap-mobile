@@ -3,6 +3,8 @@ export { FInput } from "./FInput";
 export { FText } from "./FText";
 export { FContainer } from "./FContainer";
 export { FSelect } from "./FSelect";
+export { FAlert, AlertMessageColor } from "./FAlert";
+export type { FAlertModel } from "./FAlert";
 
 export type { FButtonProps } from "./FButton";
 export type { FInputProps } from "./FInput";

@@ -28,7 +28,7 @@ export const FSalesList: React.FC<FSalesListProps> = ({
           >
             <FText color="primary" className="text-base">
               {venda.produto} - {venda.quantidade} un. - R${" "}
-              {venda.valor.toFixed(2)}
+              {venda?.valor?.toFixed(2)}
             </FText>
           </FContainer>
         ))

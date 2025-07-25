@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Alert, ScrollView } from "react-native";
-import { FContainer, FInput, FButton, FText, FSelect } from "../../atoms";
+import {
+  FContainer,
+  FInput,
+  FButton,
+  FText,
+  FSelect,
+  FAlert,
+  AlertMessageColor,
+  FAlertModel,
+} from "../../atoms";
 import { FProductInfo } from "../../molecules";
 import { estoqueService, produtosService } from "../../../services/firebase";
 import type { Produto, Estoque } from "../../../types";
@@ -30,10 +39,29 @@ export const FStockForm: React.FC<FStockFormProps> = ({
   const [estoqueSelecionado, setEstoqueSelecionado] = useState<Estoque | null>(
     null
   );
+  const [alert, setAlert] = useState<FAlertModel>();
 
   useEffect(() => {
     loadProdutosEstoque();
   }, []);
+
+  const showAlert = (
+    text: string,
+    type: AlertMessageColor = AlertMessageColor.Error
+  ) => {
+    const alertPopUp: FAlertModel = {
+      type,
+      textAlert: text,
+      options: {
+        visible: true,
+        onDismiss: () => setAlert(undefined),
+        action: { label: "X" },
+        duration: 3000,
+        children: null,
+      },
+    };
+    setAlert(alertPopUp);
+  };
 
   const loadProdutosEstoque = async () => {
     try {
@@ -41,7 +69,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
       setProdutosEstoque(estoqueData);
     } catch (error) {
       console.error("Erro ao carregar estoque:", error);
-      Alert.alert("Erro", "Não foi possível carregar o estoque");
+      showAlert("Não foi possível carregar o estoque");
     }
   };
 
@@ -56,29 +84,23 @@ export const FStockForm: React.FC<FStockFormProps> = ({
 
   const handleSubmit = async () => {
     if (!formData.produto || !formData.quantidade) {
-      Alert.alert(
-        "Erro",
-        "Por favor, selecione um produto e informe a quantidade"
-      );
+      showAlert("Por favor, selecione um produto e informe a quantidade");
       return;
     }
 
     if (!estoqueSelecionado) {
-      Alert.alert("Erro", "Produto não encontrado no estoque");
+      showAlert("Produto não encontrado no estoque");
       return;
     }
 
     const novaQuantidade = parseInt(formData.quantidade);
     if (novaQuantidade < 0) {
-      Alert.alert("Erro", "A quantidade não pode ser negativa");
+      showAlert("A quantidade não pode ser negativa");
       return;
     }
 
     if (novaQuantidade > estoqueSelecionado.capacidade_estoque) {
-      Alert.alert(
-        "Erro",
-        "A quantidade não pode ser maior que a capacidade máxima"
-      );
+      showAlert("A quantidade não pode ser maior que a capacidade máxima");
       return;
     }
 
@@ -100,7 +122,10 @@ export const FStockForm: React.FC<FStockFormProps> = ({
         novoStatus
       );
 
-      Alert.alert("Sucesso", "Quantidade e status atualizados com sucesso!");
+      showAlert(
+        "Quantidade e status atualizados com sucesso!",
+        AlertMessageColor.Success
+      );
 
       await loadProdutosEstoque();
 
@@ -121,7 +146,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
       }
     } catch (error) {
       console.error("Erro ao atualizar estoque:", error);
-      Alert.alert("Erro", "Não foi possível atualizar o estoque");
+      showAlert("Não foi possível atualizar o estoque");
     } finally {
       setLoading(false);
     }
@@ -226,7 +251,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
                   {(
                     (estoque.quantidade_estoque / estoque.capacidade_estoque) *
                     100
-                  ).toFixed(1)}
+                  )?.toFixed(1)}
                   %
                 </FText>
                 <FText variant="caption" color="secondary">
@@ -275,7 +300,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
                 (parseInt(formData.quantidade || "0") /
                   estoqueSelecionado.capacidade_estoque) *
                 100
-              ).toFixed(1)}
+              )?.toFixed(1)}
               %
             </FText>
           </FContainer>
@@ -303,6 +328,12 @@ export const FStockForm: React.FC<FStockFormProps> = ({
       >
         <FText className="text-gray-700 font-semibold">Cancelar</FText>
       </FButton>
+
+      <FAlert
+        textAlert={alert?.textAlert ?? ""}
+        type={alert?.type ?? AlertMessageColor.Info}
+        options={alert?.options}
+      />
     </FContainer>
   );
 };

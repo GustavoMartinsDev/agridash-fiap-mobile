@@ -6,6 +6,9 @@ import {
   FSelect,
   FSelectOption,
   FText,
+  FAlert,
+  AlertMessageColor,
+  FAlertModel,
 } from "../../atoms";
 import { FInputField, FProductInfo } from "../../molecules";
 import {
@@ -44,6 +47,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
   const [valor, setValor] = useState<number>(0);
   const [vendas, setVendas] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [alert, setAlert] = useState<FAlertModel>();
   const [filtros, setFiltros] = useState({
     produto: "",
     cooperado: "",
@@ -65,6 +69,24 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
     }
   }, [formData.produto, formData.quantidade]);
 
+  const showAlert = (
+    text: string,
+    type: AlertMessageColor = AlertMessageColor.Error
+  ) => {
+    const alertPopUp: FAlertModel = {
+      type,
+      textAlert: text,
+      options: {
+        visible: true,
+        onDismiss: () => setAlert(undefined),
+        action: { label: "X" },
+        duration: 3000,
+        children: null,
+      },
+    };
+    setAlert(alertPopUp);
+  };
+
   useEffect(() => {
     aplicarFiltros();
   }, [vendas, filtros]);
@@ -74,7 +96,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       const data = await cooperadosService.getCooperados();
       setCooperados(data);
     } catch (error) {
-      Alert.alert("Erro", "Falha ao carregar cooperados");
+      showAlert("Falha ao carregar cooperados");
     }
   };
 
@@ -83,7 +105,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       const data = await estoqueService.getEstoque();
       setProdutosEstoque(data);
     } catch (error) {
-      Alert.alert("Erro", "Falha ao carregar produtos do estoque");
+      showAlert("Falha ao carregar produtos do estoque");
     }
   };
 
@@ -96,7 +118,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       setVendas(vendasOrdenadas);
       setVendasFiltradas(vendasOrdenadas);
     } catch (error) {
-      Alert.alert("Erro", "Falha ao carregar histórico de vendas");
+      showAlert("Falha ao carregar histórico de vendas");
     }
   };
 
@@ -128,33 +150,31 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
     const { produto, quantidade, cooperado } = formData;
 
     if (!produto || !quantidade || !cooperado) {
-      Alert.alert("Erro", "Preencha todos os campos.");
+      showAlert("Preencha todos os campos.");
       return;
     }
 
     const quantidadeNum = Number(quantidade);
 
     if (quantidadeNum <= 0) {
-      Alert.alert("Erro", "A quantidade deve ser maior que zero.");
+      showAlert("A quantidade deve ser maior que zero.");
       return;
     }
 
     if (!estoque) {
-      Alert.alert("Erro", "Produto não encontrado no estoque.");
+      showAlert("Produto não encontrado no estoque.");
       return;
     }
 
     if (quantidadeNum > estoque.quantidade_estoque) {
-      Alert.alert(
-        "Erro",
+      showAlert(
         `Quantidade insuficiente em estoque. Disponível: ${estoque.quantidade_estoque} unidades.`
       );
       return;
     }
 
     if (quantidadeNum > estoque.capacidade_estoque) {
-      Alert.alert(
-        "Erro",
+      showAlert(
         `Quantidade não pode exceder a capacidade máxima do estoque (${estoque.capacidade_estoque} unidades).`
       );
       return;
@@ -185,10 +205,13 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
       await loadProdutosEstoque();
       await loadVendas();
 
-      Alert.alert("Venda registrada!", "A venda foi adicionada ao histórico.");
+      showAlert(
+        "A venda foi adicionada ao histórico.",
+        AlertMessageColor.Success
+      );
       onSubmit?.();
     } catch (error) {
-      Alert.alert("Erro", "Falha ao registrar venda.");
+      showAlert("Falha ao registrar venda.");
     }
   };
 
@@ -330,7 +353,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
                   💰 Valor Total da Venda
                 </FText>
                 <FText variant="title" className="text-success-600 font-bold">
-                  R$ {valor.toFixed(2)}
+                  R$ {valor?.toFixed(2)}
                 </FText>
               </FContainer>
             </FContainer>
@@ -413,7 +436,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
                 💰 Total em Vendas
               </FText>
               <FText variant="title" className="text-success-600 font-bold">
-                R$ {calcularTotalVendas().toFixed(2)}
+                R$ {calcularTotalVendas()?.toFixed(2)}
               </FText>
             </FContainer>
 
@@ -466,7 +489,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
                     >
                       R${" "}
                       {typeof venda.valor === "number"
-                        ? venda.valor.toFixed(2)
+                        ? venda?.valor?.toFixed(2)
                         : "0,00"}
                     </FText>
                   </FContainer>
@@ -496,7 +519,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
                     <FText variant="caption" className="text-brand-600">
                       💵 Valor unitário: R${" "}
                       {venda.quantidade > 0
-                        ? (venda.valor / venda.quantidade).toFixed(2)
+                        ? (venda.valor / venda.quantidade)?.toFixed(2)
                         : "0,00"}
                     </FText>
                     <FContainer className="px-2 py-1 bg-brand-50 rounded">
@@ -514,6 +537,12 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
           </ScrollView>
         </>
       )}
+
+      <FAlert
+        textAlert={alert?.textAlert ?? ""}
+        type={alert?.type ?? AlertMessageColor.Info}
+        options={alert?.options}
+      />
     </FContainer>
   );
 };
