@@ -13,21 +13,20 @@ import {
 import { db } from "../config/firebase";
 
 export interface Notificacao {
-  id: string;
+  id: number;
   titulo: string;
   mensagem: string;
   lida: boolean;
   dataCriacao: string;
-  usuarioId: string;
+  idUsuario: string;
   tipo: string;
-  usuarioIdLeitura?: string;
+  idUsuarioLeitura?: string;
   dataLeitura?: string;
 }
 
 class NotificacaoService {
   private collection = collection(db, "notificacoes");
 
-  // Escutar notificações não lidas em tempo real
   escutarNotificacoesNaoLidas(
     usuarioId: string,
     callback: (notificacoes: Notificacao[]) => void
@@ -46,8 +45,8 @@ class NotificacaoService {
             .map((doc) => {
               const data = doc.data();
               return {
-                id: doc.id,
                 ...data,
+                // Manter o id do campo interno, não o ID do documento
               } as Notificacao;
             })
             .sort(
@@ -72,19 +71,30 @@ class NotificacaoService {
     notificacaoId: string,
     usuarioId: string
   ): Promise<void> {
-    debugger;
-    const notificacaoSnap = await getDocs(
-      query(this.collection, where("id", "==", notificacaoId))
-    );
+    try {
+      const q = query(
+        this.collection,
+        where("id", "==", parseInt(notificacaoId))
+      );
 
-    if (notificacaoSnap.empty) {
-      throw new Error("Notificação não encontrada");
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        throw new Error("Notificação não encontrada");
+      }
+
+      const docSnapshot = querySnapshot.docs[0];
+      const notificacaoRef = doc(db, "notificacoes", docSnapshot.id);
+
+      await updateDoc(notificacaoRef, {
+        lida: true,
+        idUsuarioLeitura: usuarioId,
+        dataLeitura: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Erro ao marcar notificação como lida:", error);
+      throw new Error("Não foi possível marcar a notificação como lida");
     }
-    const notificacaoRef = doc(db, "notificacoes", notificacaoId);
-    await updateDoc(notificacaoRef, {
-      lida: true,
-      usuarioIdLeitura: usuarioId,
-    });
   }
 
   async marcarVariasComoLidas(
@@ -93,14 +103,30 @@ class NotificacaoService {
   ): Promise<void> {
     const batch = writeBatch(db);
 
-    notificacaoIds.forEach((id) => {
-      const notificacaoRef = doc(db, "notificacoes", id);
-      batch.update(notificacaoRef, {
-        lida: true,
-        usuarioIdLeitura: usuarioId,
-        dataLeitura: new Date().toISOString(),
-      });
-    });
+    for (const notificacaoId of notificacaoIds) {
+      try {
+        // Buscar o documento pelo campo 'id' interno
+        const q = query(
+          this.collection,
+          where("id", "==", parseInt(notificacaoId))
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const docSnapshot = querySnapshot.docs[0];
+          const notificacaoRef = doc(db, "notificacoes", docSnapshot.id);
+
+          batch.update(notificacaoRef, {
+            lida: true,
+            idUsuarioLeitura: usuarioId,
+            dataLeitura: new Date().toISOString(),
+          });
+        }
+      } catch (error) {
+        console.error(`Erro ao processar notificação ${notificacaoId}:`, error);
+      }
+    }
 
     await batch.commit();
   }

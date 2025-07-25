@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dimensions, Alert, TouchableOpacity } from "react-native";
-import { LineChart, BarChart, PieChart } from "react-native-gifted-charts";
+import { Alert, TouchableOpacity } from "react-native";
 import {
   DashboardTemplate,
   Section,
@@ -9,13 +8,8 @@ import {
   FButton,
 } from "../components";
 import { FNotificationModal } from "../components/molecules";
-import {
-  FSalesForm,
-  FStockForm,
-  FSalesList,
-  FChartContainer,
-} from "../components/organisms";
-import { NavigationProps, Venda, Estoque, ChartData } from "../types";
+import { FSalesForm, FStockForm, FSalesList } from "../components/organisms";
+import { NavigationProps, Venda, Estoque } from "../types";
 import { vendasService, estoqueService } from "../services/firebase";
 import { useNotificacoes } from "../hooks/useNotificacoes";
 import { useAuth } from "../context/AuthContext";
@@ -30,33 +24,29 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
   const [modalNotificacaoVisivel, setModalNotificacaoVisivel] = useState(false);
   const { user, logout } = useAuth();
 
-  // Hook para gerenciar notificações usando o ID do usuário logado
   const {
     notificacoesNaoLidas,
     quantidadeNaoLidas,
     marcarComoLida,
     marcarTodasComoLidas,
   } = useNotificacoes({
-    usuarioId: user?.uid!, // Usa o UID do usuário logado ou fallback para "1"
+    usuarioId: user?.uid!,
   });
 
-  // Função para fazer logout
   const handleLogout = async () => {
     try {
       await logout();
-      onLogout?.(); // Chama o callback para navegar para tela de login
+      onLogout?.();
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       Alert.alert("Erro", "Não foi possível fazer logout");
     }
   };
 
-  // Função para abrir modal de notificações
   const abrirModalNotificacoes = () => {
     setModalNotificacaoVisivel(true);
   };
 
-  // Função para fechar modal de notificações
   const fecharModalNotificacoes = () => {
     setModalNotificacaoVisivel(false);
   };

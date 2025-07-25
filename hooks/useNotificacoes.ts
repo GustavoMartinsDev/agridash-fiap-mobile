@@ -43,7 +43,10 @@ export const useNotificacoes = ({ usuarioId }: UseNotificacoesProps) => {
       if (!notificacaoId) {
         throw new Error("ID da notificação é obrigatório");
       }
-      await notificacaoService.marcarComoLida(notificacaoId, usuarioId);
+      await notificacaoService.marcarComoLida(
+        notificacaoId.toString(),
+        usuarioId
+      );
       // O listener do Firestore irá atualizar automaticamente a lista
     } catch (error) {
       console.error("Erro ao marcar como lida:", error);
@@ -53,7 +56,7 @@ export const useNotificacoes = ({ usuarioId }: UseNotificacoesProps) => {
 
   const marcarTodasComoLidas = async () => {
     try {
-      const ids = notificacoesNaoLidas.map((n) => n.id);
+      const ids = notificacoesNaoLidas.map((n) => n.id.toString());
       await notificacaoService.marcarVariasComoLidas(ids, usuarioId);
       // O listener do Firestore irá atualizar automaticamente a lista
     } catch (error) {

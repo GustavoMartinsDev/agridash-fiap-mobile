@@ -22,11 +22,17 @@ export const FNotificationModal: React.FC<FNotificationModalProps> = ({
   const [marcandoLida, setMarcandoLida] = useState<string | null>(null);
   const [marcandoTodas, setMarcandoTodas] = useState(false);
 
-  const handleMarcarComoLida = async (id: string) => {
-    console.log("Modal - ID recebido:", id, "Tipo:", typeof id);
-    setMarcandoLida(id);
+  const handleMarcarComoLida = async (id: number) => {
+    const idString = id.toString();
+    setMarcandoLida(idString);
     try {
-      await onMarcarComoLida(id);
+      console.log("Modal - Marcando como lida ID:", id, "Tipo:", typeof id);
+      if (!id || typeof id !== "number") {
+        throw new Error("ID da notificação inválido");
+      }
+      await onMarcarComoLida(idString);
+    } catch (error) {
+      console.error("Erro no modal ao marcar como lida:", error);
     } finally {
       setMarcandoLida(null);
     }
@@ -144,9 +150,7 @@ export const FNotificationModal: React.FC<FNotificationModalProps> = ({
                 disabled={marcandoTodas}
               >
                 <FText className="text-blue-700 font-bold">
-                  {marcandoTodas
-                    ? "⏳ Marcando..."
-                    : "✓ Marcar todas como lidas"}
+                  {marcandoTodas ? "Marcando..." : "Marcar todas como lidas"}
                 </FText>
               </FButton>
             </FContainer>
@@ -160,7 +164,7 @@ export const FNotificationModal: React.FC<FNotificationModalProps> = ({
             {notificacoes.length === 0 ? (
               <FContainer className="items-center py-8">
                 <FText variant="body" className="text-gray-500 text-center">
-                  🎉 Nenhuma notificação não lida!
+                  Nenhuma notificação não lida!
                 </FText>
                 <FText
                   variant="caption"
@@ -196,10 +200,10 @@ export const FNotificationModal: React.FC<FNotificationModalProps> = ({
 
                     <TouchableOpacity
                       onPress={() => handleMarcarComoLida(notificacao.id)}
-                      disabled={marcandoLida === notificacao.id}
+                      disabled={marcandoLida === notificacao.id.toString()}
                       style={{
                         backgroundColor:
-                          marcandoLida === notificacao.id
+                          marcandoLida === notificacao.id.toString()
                             ? "#9ca3af"
                             : "#10b981",
                         paddingHorizontal: 12,
@@ -208,7 +212,9 @@ export const FNotificationModal: React.FC<FNotificationModalProps> = ({
                       }}
                     >
                       <FText className="text-white font-bold text-sm">
-                        {marcandoLida === notificacao.id ? "⏳" : "✓ Lida"}
+                        {marcandoLida === notificacao.id.toString()
+                          ? "⏳"
+                          : "✓ Lida"}
                       </FText>
                     </TouchableOpacity>
                   </FContainer>
