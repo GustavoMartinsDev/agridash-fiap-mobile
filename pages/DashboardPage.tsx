@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dimensions, Alert } from "react-native";
+import { Dimensions, Alert, TouchableOpacity } from "react-native";
 import { LineChart, BarChart, PieChart } from "react-native-gifted-charts";
 import {
   DashboardTemplate,
@@ -8,6 +8,7 @@ import {
   FContainer,
   FButton,
 } from "../components";
+import { FNotificationModal } from "../components/molecules";
 import {
   FSalesForm,
   FStockForm,
@@ -16,8 +17,8 @@ import {
 } from "../components/organisms";
 import { NavigationProps, Venda, Estoque, ChartData } from "../types";
 import { vendasService, estoqueService } from "../services/firebase";
-
-const screenWidth = Dimensions.get("window").width;
+import { useNotificacoes } from "../hooks/useNotificacoes";
+import { useAuth } from "../context/AuthContext";
 
 export interface DashboardPageProps extends NavigationProps {}
 
@@ -26,6 +27,39 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
   const [estoque, setEstoque] = useState<Estoque[]>([]);
   const [activeTab, setActiveTab] = useState<"vendas" | "estoque">("vendas");
   const [loading, setLoading] = useState(true);
+  const [modalNotificacaoVisivel, setModalNotificacaoVisivel] = useState(false);
+  const { user, logout } = useAuth();
+
+  // Hook para gerenciar notificações usando o ID do usuário logado
+  const {
+    notificacoesNaoLidas,
+    quantidadeNaoLidas,
+    marcarComoLida,
+    marcarTodasComoLidas,
+  } = useNotificacoes({
+    usuarioId: user?.uid!, // Usa o UID do usuário logado ou fallback para "1"
+  });
+
+  // Função para fazer logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      onLogout?.(); // Chama o callback para navegar para tela de login
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      Alert.alert("Erro", "Não foi possível fazer logout");
+    }
+  };
+
+  // Função para abrir modal de notificações
+  const abrirModalNotificacoes = () => {
+    setModalNotificacaoVisivel(true);
+  };
+
+  // Função para fechar modal de notificações
+  const fecharModalNotificacoes = () => {
+    setModalNotificacaoVisivel(false);
+  };
 
   useEffect(() => {
     loadData();
@@ -48,67 +82,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
     }
   };
 
-  const vendasPorMes = () => {
-    const meses = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    const vendasPorMes = new Array(12).fill(0);
-
-    vendas.forEach((venda) => {
-      const mes = venda.data.getMonth();
-      vendasPorMes[mes] += venda.valor;
-    });
-
-    return meses.map((mes, index) => ({
-      value: vendasPorMes[index],
-      label: mes,
-    }));
-  };
-
-  const estoqueData = (): ChartData[] => {
-    return estoque.map((item) => ({
-      value: item.quantidade_estoque,
-      label: item.nome_produto,
-      frontColor: "#4e7934",
-    }));
-  };
-
-  const categoriasData = (): ChartData[] => {
-    const produtosCategorias: Record<string, { value: number; color: string }> =
-      {
-        Soja: { value: 0, color: "#4e7934" },
-        Milho: { value: 0, color: "#b2a177" },
-        Arroz: { value: 0, color: "#7c6f57" },
-        Feijão: { value: 0, color: "#c0392b" },
-        Trigo: { value: 0, color: "#e67e22" },
-      };
-
-    vendas.forEach((venda) => {
-      if (produtosCategorias[venda.produto]) {
-        produtosCategorias[venda.produto].value += venda.valor;
-      }
-    });
-
-    return Object.entries(produtosCategorias)
-      .map(([produto, data]) => ({
-        value: data.value,
-        color: data.color,
-        text: produto,
-      }))
-      .filter((item) => item.value > 0);
-  };
-
   const handleNovaVenda = async () => {
     try {
       const vendasData = await vendasService.getVendas();
@@ -127,7 +100,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
 
   if (loading) {
     return (
-      <DashboardTemplate title="Dashboard AgriDash" onLogout={onLogout}>
+      <DashboardTemplate title="Dashboard AgriDash" onLogout={handleLogout}>
         <FContainer className="flex-1 justify-center items-center">
           <FText variant="title" color="primary">
             Carregando...
@@ -138,7 +111,52 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
   }
 
   return (
-    <DashboardTemplate title="Dashboard AgriDash" onLogout={onLogout}>
+    <DashboardTemplate title="Dashboard AgriDash" onLogout={handleLogout}>
+      {/* Indicador de Notificações */}
+      {quantidadeNaoLidas > 0 && (
+        <TouchableOpacity onPress={abrirModalNotificacoes}>
+          <FContainer className="mb-4 p-4 bg-warning-50 border border-warning-200 rounded-lg shadow-sm">
+            <FContainer className="flex-row justify-between items-center">
+              <FContainer className="flex-1">
+                <FText
+                  variant="body"
+                  className="text-warning-800 font-semibold"
+                >
+                  🔔 {quantidadeNaoLidas} notificação(ões) não lida(s)
+                </FText>
+                <FText variant="caption" className="text-warning-600 mt-1">
+                  {notificacoesNaoLidas[0]?.titulo ||
+                    "Novas notificações disponíveis"}
+                </FText>
+              </FContainer>
+              <FText className="text-warning-600 font-bold">
+                📋 Ver todas →
+              </FText>
+            </FContainer>
+          </FContainer>
+        </TouchableOpacity>
+      )}
+
+      {/* Informações do usuário logado */}
+      {user && (
+        <FContainer className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm">
+          <FText variant="body" className="text-green-800 font-bold mb-2">
+            👤 Usuário logado
+          </FText>
+          {user.displayName && (
+            <FText variant="caption" className="text-green-700">
+              📝 Nome: {user.displayName}
+            </FText>
+          )}
+          <FText variant="caption" className="text-green-700">
+            📧 E-mail: {user.email}
+          </FText>
+          <FText variant="caption" className="text-green-700">
+            🆔 ID: {user.uid}
+          </FText>
+        </FContainer>
+      )}
+
       <FContainer className="flex-row mb-4">
         <FButton
           variant={activeTab === "vendas" ? "primary" : "secondary"}
@@ -252,6 +270,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
           </Section> */}
         </>
       )}
+
+      {/* Modal de Notificações */}
+      <FNotificationModal
+        visible={modalNotificacaoVisivel}
+        notificacoes={notificacoesNaoLidas}
+        onClose={fecharModalNotificacoes}
+        onMarcarComoLida={marcarComoLida}
+        onMarcarTodasComoLidas={marcarTodasComoLidas}
+      />
     </DashboardTemplate>
   );
 };

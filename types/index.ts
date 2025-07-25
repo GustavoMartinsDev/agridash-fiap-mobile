@@ -7,6 +7,7 @@ export interface FormData {
   email: string;
   senha: string;
   confirmarSenha?: string;
+  nome?: string;
 }
 
 export interface ValidationState {
@@ -76,6 +77,7 @@ export interface Venda {
 export interface User {
   uid: string;
   email: string;
+  displayName?: string;
 }
 
 export type ScreenType = "login" | "register" | "dashboard";

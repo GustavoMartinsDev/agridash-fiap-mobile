@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updateProfile,
   User as FirebaseUser,
 } from "firebase/auth";
 import { auth } from "../config/firebase";
@@ -18,18 +19,32 @@ export const authService = {
     return {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
+      displayName: userCredential.user.displayName || undefined,
     };
   },
 
-  async register(email: string, password: string): Promise<User> {
+  async register(
+    email: string,
+    password: string,
+    displayName?: string
+  ): Promise<User> {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
+
+    // Atualiza o perfil com displayName se fornecido
+    if (displayName) {
+      await updateProfile(userCredential.user, {
+        displayName: displayName,
+      });
+    }
+
     return {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
+      displayName: displayName,
     };
   },
 
@@ -43,6 +58,7 @@ export const authService = {
         callback({
           uid: firebaseUser.uid,
           email: firebaseUser.email!,
+          displayName: firebaseUser.displayName || undefined,
         });
       } else {
         callback(null);
@@ -56,6 +72,7 @@ export const authService = {
       return {
         uid: firebaseUser.uid,
         email: firebaseUser.email!,
+        displayName: firebaseUser.displayName || undefined,
       };
     }
     return null;

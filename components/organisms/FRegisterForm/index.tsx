@@ -3,7 +3,7 @@ import { Alert, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FContainer, FButton, FText } from "../../atoms";
 import { FInputField, FLinkButton } from "../../molecules";
-import { authService } from "../../../services/auth";
+import { useAuth } from "../../../context/AuthContext";
 import {
   FormData,
   ValidationState,
@@ -28,6 +28,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
     email: "",
     senha: "",
     confirmarSenha: "",
+    nome: "",
   });
 
   const [validation, setValidation] = useState<ValidationState>({
@@ -38,6 +39,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const { signUp } = useAuth();
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -53,6 +55,10 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
       ...prev,
       emailValido: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text),
     }));
+  };
+
+  const validarNome = (text: string) => {
+    setFormData((prev) => ({ ...prev, nome: text }));
   };
 
   const validarSenha = (text: string) => {
@@ -97,7 +103,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
 
   const handleSubmit = async () => {
     const { emailValido, senhaValida, senhasIguais } = validation;
-    const { email, senha, confirmarSenha } = formData;
+    const { email, senha, confirmarSenha, nome } = formData;
 
     if (
       !emailValido ||
@@ -105,7 +111,8 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
       !senhasIguais ||
       !email ||
       !senha ||
-      !confirmarSenha
+      !confirmarSenha ||
+      !nome
     ) {
       Alert.alert("Erro", "Verifique os campos e tente novamente.");
       return;
@@ -114,12 +121,9 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
     setLoading(true);
 
     try {
-      const user = await authService.register(email, senha);
+      await signUp({ email, password: senha, displayName: nome });
 
-      Alert.alert(
-        "Sucesso",
-        `Conta criada com sucesso! Bem-vindo, ${user.email}!`
-      );
+      Alert.alert("Sucesso", `Conta criada com sucesso! Bem-vindo, ${nome}!`);
 
       if (onSubmit) {
         onSubmit(formData);
@@ -327,8 +331,16 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
           style={{ minWidth: 320, maxWidth: 420, alignSelf: "center" }}
         >
           <FInputField
+            type="text"
+            placeholder="Nome"
+            value={formData.nome}
+            onChangeText={validarNome}
+            className="mb-4"
+          />
+
+          <FInputField
             type="email"
-            placeholder="✉️ E-mail"
+            placeholder="E-mail"
             value={formData.email}
             onChangeText={validarEmail}
             error={
@@ -339,7 +351,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
 
           <FInputField
             type="password"
-            placeholder="🔒 Senha"
+            placeholder="Senha"
             value={formData.senha}
             onChangeText={validarSenha}
             error={getSenhaErrorMessage()}
@@ -351,7 +363,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
 
           <FInputField
             type="password"
-            placeholder="🔐 Confirmar senha"
+            placeholder="Confirmar senha"
             value={formData.confirmarSenha}
             onChangeText={validarConfirmarSenha}
             error={
@@ -391,7 +403,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
             <FContainer className="px-4 py-3 rounded-full bg-brand-50 border border-brand-200">
               <FLinkButton onPress={irParaLogin!}>
                 <FText variant="body" className="text-brand-700 font-semibold">
-                  👈 Já tenho uma conta
+                  Já tenho uma conta
                 </FText>
               </FLinkButton>
             </FContainer>

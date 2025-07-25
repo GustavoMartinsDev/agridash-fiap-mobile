@@ -12,7 +12,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 }) => {
   return (
     <View style={{ flex: 1 }}>
-      {/* Background gradiente para toda a tela */}
       <LinearGradient
         colors={["#f0f9ff", "#e0f2fe", "#bae6fd"]}
         start={{ x: 0, y: 0 }}
@@ -51,7 +50,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </LinearGradient>
           </View>
         }
-        subtitle="🌱 Gestão de Cooperativas Agrícolas"
+        subtitle="Gestão de Cooperativas Agrícolas"
         className="bg-transparent"
       >
         <LoginForm

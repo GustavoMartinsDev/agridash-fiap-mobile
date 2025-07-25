@@ -7,11 +7,10 @@ import {
   orderBy,
   onSnapshot,
   doc,
-  getDoc,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
-import { Cooperado, Produto, Estoque, Venda } from "../types";
+import { Cooperado, Estoque, Venda } from "../types";
 
 export const cooperadosService = {
   async getCooperados(): Promise<Cooperado[]> {

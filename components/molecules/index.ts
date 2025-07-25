@@ -2,6 +2,7 @@ export { FInputField } from "./FInputField";
 export { FLinkButton } from "./FLinkButton";
 export { FHeader } from "./FHeader";
 export { FSection } from "./FSection";
+export { FNotificationModal } from "./FNotificationModal";
 
 export type { FInputFieldProps } from "./FInputField";
 export type { FLinkButtonProps } from "./FLinkButton";

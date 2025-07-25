@@ -3,7 +3,7 @@ import { Alert, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FContainer, FButton, FText } from "../../atoms";
 import { FInputField, FLinkButton } from "../../molecules";
-import { authService } from "../../../services/auth";
+import { useAuth } from "../../../context/AuthContext";
 import {
   FormData,
   ValidationState,
@@ -35,6 +35,7 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const { signIn, user } = useAuth();
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -95,7 +96,7 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
     setLoading(true);
 
     try {
-      const user = await authService.login(email, senha);
+      await signIn({ email, password: senha });
 
       if (onSubmit) {
         onSubmit(formData);
@@ -103,7 +104,7 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
         irParaDashboard?.();
       }
 
-      Alert.alert("Sucesso", `Bem-vindo, ${user.email}!`);
+      Alert.alert("Sucesso", `Bem-vindo, ${email}!`);
     } catch (error: any) {
       console.error("Erro no login:", error);
 
@@ -166,7 +167,7 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
         >
           <FInputField
             type="email"
-            placeholder="✉️ E-mail"
+            placeholder="E-mail"
             value={formData.email}
             onChangeText={validarEmail}
             error={
@@ -177,7 +178,7 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
 
           <FInputField
             type="password"
-            placeholder="🔒 Senha"
+            placeholder="Senha"
             value={formData.senha}
             onChangeText={validarSenha}
             className="mb-2"
@@ -216,7 +217,7 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
                   variant="body"
                   className="text-success-700 font-semibold"
                 >
-                  ✨ Criar nova conta
+                  Criar nova conta
                 </FText>
               </FLinkButton>
             </FContainer>
