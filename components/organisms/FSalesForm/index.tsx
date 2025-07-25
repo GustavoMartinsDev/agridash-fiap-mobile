@@ -7,7 +7,7 @@ import {
   FSelectOption,
   FText,
 } from "../../atoms";
-import { FInputField } from "../../molecules";
+import { FInputField, FProductInfo } from "../../molecules";
 import {
   VendaData,
   BaseComponentProps,
@@ -263,27 +263,6 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
     value: c.nome,
   }));
 
-  const getStatusColor = (quantidade: number, capacidade: number) => {
-    const percentual = (quantidade / capacidade) * 100;
-    if (percentual <= 20) return "text-danger-600";
-    if (percentual <= 50) return "text-warning-600";
-    return "text-success-600";
-  };
-
-  const getStatusText = (quantidade: number, capacidade: number) => {
-    const percentual = (quantidade / capacidade) * 100;
-    if (percentual <= 20) return "Baixo";
-    if (percentual <= 80) return "Médio";
-    return "Alto";
-  };
-
-  const getStatusBgColor = (quantidade: number, capacidade: number) => {
-    const percentual = (quantidade / capacidade) * 100;
-    if (percentual <= 20) return "bg-danger-50 border-danger-200";
-    if (percentual <= 50) return "bg-warning-50 border-warning-200";
-    return "bg-success-50 border-success-200";
-  };
-
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -320,49 +299,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
 
       {!showHistory ? (
         <>
-          {estoque && (
-            <FContainer
-              className={`mb-4 p-3 rounded-lg border ${getStatusBgColor(estoque.quantidade_estoque, estoque.capacidade_estoque)}`}
-            >
-              <FContainer className="flex-row justify-between items-center mb-2">
-                <FText variant="subtitle" color="primary" className="font-bold">
-                  📦 {estoque.nome_produto}
-                </FText>
-                <FText
-                  variant="caption"
-                  className={`font-bold ${getStatusColor(estoque.quantidade_estoque, estoque.capacidade_estoque)}`}
-                >
-                  {getStatusText(
-                    estoque.quantidade_estoque,
-                    estoque.capacidade_estoque
-                  )}
-                </FText>
-              </FContainer>
-
-              <FContainer className="flex-row justify-between mb-2">
-                <FText variant="caption" color="secondary">
-                  Em estoque: {estoque.quantidade_estoque} unidades
-                </FText>
-                <FText variant="caption" color="secondary">
-                  Capacidade: {estoque.capacidade_estoque} unidades
-                </FText>
-              </FContainer>
-
-              <FContainer className="flex-row justify-between">
-                <FText variant="caption" color="secondary">
-                  Ocupação:{" "}
-                  {(
-                    (estoque.quantidade_estoque / estoque.capacidade_estoque) *
-                    100
-                  ).toFixed(1)}
-                  %
-                </FText>
-                <FText variant="caption" color="secondary">
-                  Status: {estoque.status_estoque}
-                </FText>
-              </FContainer>
-            </FContainer>
-          )}
+          {estoque && <FProductInfo produto={estoque} className="mb-4" />}
 
           <FSelect
             options={produtoOptions}

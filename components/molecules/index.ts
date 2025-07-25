@@ -4,6 +4,7 @@ export { FHeader } from "./FHeader";
 export { FSection } from "./FSection";
 export { FNotificationModal } from "./FNotificationModal";
 export { FPasswordStrength } from "./FPasswordStrength";
+export { FProductInfo } from "./FProductInfo";
 
 export type { FInputFieldProps } from "./FInputField";
 export type { FLinkButtonProps } from "./FLinkButton";

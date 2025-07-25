@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Alert, ScrollView } from "react-native";
 import { FContainer, FInput, FButton, FText, FSelect } from "../../atoms";
+import { FProductInfo } from "../../molecules";
 import { estoqueService, produtosService } from "../../../services/firebase";
 import type { Produto, Estoque } from "../../../types";
 
@@ -116,6 +117,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
 
       if (estoqueAtualizado) {
         onSubmit?.(estoqueAtualizado);
+        resetForm();
       }
     } catch (error) {
       console.error("Erro ao atualizar estoque:", error);
@@ -240,48 +242,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
       </ScrollView>
 
       {estoqueSelecionado && (
-        <FContainer
-          className={`mb-4 p-3 rounded-lg border ${getStatusBgColor(estoqueSelecionado.quantidade_estoque, estoqueSelecionado.capacidade_estoque)}`}
-        >
-          <FContainer className="flex-row justify-between items-center mb-2">
-            <FText variant="subtitle" color="primary" className="font-bold">
-              � {estoqueSelecionado.nome_produto}
-            </FText>
-            <FText
-              variant="caption"
-              className={`font-bold ${getStatusColor(estoqueSelecionado.quantidade_estoque, estoqueSelecionado.capacidade_estoque)}`}
-            >
-              {getStatusText(
-                estoqueSelecionado.quantidade_estoque,
-                estoqueSelecionado.capacidade_estoque
-              )}
-            </FText>
-          </FContainer>
-
-          <FContainer className="flex-row justify-between mb-2">
-            <FText variant="caption" color="secondary">
-              Atual: {estoqueSelecionado.quantidade_estoque} unidades
-            </FText>
-            <FText variant="caption" color="secondary">
-              Capacidade: {estoqueSelecionado.capacidade_estoque} unidades
-            </FText>
-          </FContainer>
-
-          <FContainer className="flex-row justify-between">
-            <FText variant="caption" color="secondary">
-              Ocupação:{" "}
-              {(
-                (estoqueSelecionado.quantidade_estoque /
-                  estoqueSelecionado.capacidade_estoque) *
-                100
-              ).toFixed(1)}
-              %
-            </FText>
-            <FText variant="caption" color="secondary">
-              Status: {estoqueSelecionado.status_estoque}
-            </FText>
-          </FContainer>
-        </FContainer>
+        <FProductInfo produto={estoqueSelecionado} className="mb-4" />
       )}
 
       {/* Formulário de Edição */}
@@ -307,7 +268,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
         <FContainer className="mb-3 p-3 bg-success-50 rounded-lg border border-success-200">
           <FContainer className="flex-row justify-between items-center">
             <FText variant="body" color="primary" className="font-bold">
-              � Nova Ocupação
+              📊 Nova Ocupação
             </FText>
             <FText variant="title" className="text-success-600 font-bold">
               {(
@@ -330,7 +291,7 @@ export const FStockForm: React.FC<FStockFormProps> = ({
         loading={loading}
         className="mt-2"
       >
-        ✅ Atualizar Quantidade
+        Atualizar Quantidade
       </FButton>
 
       <FButton
@@ -338,9 +299,9 @@ export const FStockForm: React.FC<FStockFormProps> = ({
         size="medium"
         fullWidth
         onPress={resetForm}
-        className="mt-2"
+        className="mt-2 bg-gray-300 border border-gray-400"
       >
-        🔄 Limpar Seleção
+        <FText className="text-gray-700 font-semibold">Cancelar</FText>
       </FButton>
     </FContainer>
   );
