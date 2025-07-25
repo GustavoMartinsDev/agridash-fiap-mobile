@@ -112,7 +112,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
 
   return (
     <DashboardTemplate title="Dashboard AgriDash" onLogout={handleLogout}>
-      {/* Indicador de Notificações */}
+      <FText variant="body" className="text-green-800  font-bold mb-2">
+        Olá, {user?.displayName}
+      </FText>
       {quantidadeNaoLidas > 0 && (
         <TouchableOpacity onPress={abrirModalNotificacoes}>
           <FContainer className="mb-4 p-4 bg-warning-50 border border-warning-200 rounded-lg shadow-sm">
@@ -122,114 +124,47 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
                   variant="body"
                   className="text-warning-800 font-semibold"
                 >
-                  🔔 {quantidadeNaoLidas} notificação(ões) não lida(s)
+                  {quantidadeNaoLidas}{" "}
+                  {quantidadeNaoLidas > 1 ? "notificações" : "notificação"} não
+                  lida(s)
                 </FText>
                 <FText variant="caption" className="text-warning-600 mt-1">
                   {notificacoesNaoLidas[0]?.titulo ||
                     "Novas notificações disponíveis"}
                 </FText>
               </FContainer>
-              <FText className="text-warning-600 font-bold">
-                📋 Ver todas →
-              </FText>
+              <FText className="text-warning-600 font-bold">Ver todas →</FText>
             </FContainer>
           </FContainer>
         </TouchableOpacity>
       )}
 
-      {/* Informações do usuário logado */}
-      {user && (
-        <FContainer className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm">
-          <FText variant="body" className="text-green-800 font-bold mb-2">
-            👤 Usuário logado
-          </FText>
-          {user.displayName && (
-            <FText variant="caption" className="text-green-700">
-              📝 Nome: {user.displayName}
-            </FText>
-          )}
-          <FText variant="caption" className="text-green-700">
-            📧 E-mail: {user.email}
-          </FText>
-          <FText variant="caption" className="text-green-700">
-            🆔 ID: {user.uid}
-          </FText>
-        </FContainer>
-      )}
-
-      <FContainer className="flex-row mb-4">
+      <FContainer className="flex-row mb-4 bg-white p-2 rounded-lg shadow-sm">
         <FButton
           variant={activeTab === "vendas" ? "primary" : "secondary"}
           size="medium"
           onPress={() => setActiveTab("vendas")}
-          className="flex-1 mr-2 bg-farm-green-200"
+          className={`flex-1 mr-1 ${
+            activeTab === "vendas"
+              ? "bg-green-600 shadow-md"
+              : "bg-white border-2 border-green-600"
+          }`}
         >
-          Vendas
+          <FText className={`font-bold text-green-600`}>Vendas</FText>
         </FButton>
         <FButton
           variant={activeTab === "estoque" ? "primary" : "secondary"}
           size="medium"
           onPress={() => setActiveTab("estoque")}
-          className="flex-1 ml-2"
+          className={`flex-1 ml-1 ${
+            activeTab === "estoque"
+              ? "bg-blue-600 shadow-md"
+              : "bg-white border-2 border-blue-600"
+          }`}
         >
-          Estoque
+          <FText className={`font-bold text-blue-600`}>Estoque</FText>
         </FButton>
       </FContainer>
-
-      {/* <Section title="Vendas por Mês">
-        <FChartContainer>
-          <LineChart
-            data={vendasPorMes()}
-            width={screenWidth - 32}
-            height={180}
-            color="#4e7934"
-            thickness={3}
-            hideDataPoints
-            areaChart
-            startFillColor="#e6f2d6"
-            endFillColor="#e6f2d6"
-            yAxisColor="#b2a177"
-            xAxisColor="#b2a177"
-            xAxisLabelTextStyle={{ color: "#7c6f57" }}
-            yAxisTextStyle={{ color: "#7c6f57" }}
-            noOfSections={4}
-          />
-        </FChartContainer>
-      </Section>
-
-      <Section title="Estoque Atual">
-        <FChartContainer>
-          <BarChart
-            data={estoqueData()}
-            width={screenWidth - 32}
-            height={180}
-            barWidth={32}
-            spacing={24}
-            yAxisColor="#b2a177"
-            xAxisColor="#b2a177"
-            xAxisLabelTextStyle={{ color: "#7c6f57" }}
-            yAxisTextStyle={{ color: "#7c6f57" }}
-          />
-        </FChartContainer>
-      </Section> */}
-
-      {/* <Section title="Categorias de Produtos">
-        <FChartContainer>
-          <PieChart
-            data={categoriasData()}
-            donut
-            showText
-            textColor="white"
-            radius={70}
-            innerRadius={40}
-            centerLabelComponent={() => (
-              <FText color="primary" className="font-bold">
-                Total
-              </FText>
-            )}
-          />
-        </FChartContainer>
-      </Section> */}
 
       {activeTab === "vendas" ? (
         <>
@@ -246,28 +181,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
           <Section title="Gerenciar Estoque">
             <FStockForm onSubmit={handleNovoEstoque} className="mb-4" />
           </Section>
-
-          {/* <Section title="Estoque Atual">
-            <FContainer>
-              {estoque.map((item, index) => (
-                <FContainer
-                  key={index}
-                  className="p-3 mb-2 bg-white rounded-lg shadow"
-                >
-                  <FText variant="subtitle" color="primary" className="mb-1">
-                    {item.produto}
-                  </FText>
-                  <FText variant="body" color="secondary">
-                    Quantidade: {item.quantidade} / {item.capacidade}
-                  </FText>
-                  <FText variant="caption" color="secondary">
-                    Ocupação:{" "}
-                    {((item.quantidade / item.capacidade) * 100).toFixed(1)}%
-                  </FText>
-                </FContainer>
-              ))}
-            </FContainer>
-          </Section> */}
         </>
       )}
 

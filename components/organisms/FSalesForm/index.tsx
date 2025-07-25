@@ -419,7 +419,7 @@ export const FSalesForm: React.FC<FSalesFormProps> = ({
             loading={loading}
             className="mt-2"
           >
-            ✅ Registrar Venda
+            Registrar
           </FButton>
         </>
       ) : (

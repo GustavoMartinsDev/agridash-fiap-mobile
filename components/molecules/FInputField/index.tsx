@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 import { FInput, FText, FInputProps } from "../../atoms";
 import { BaseComponentProps } from "../../../types";
 
@@ -53,9 +54,11 @@ export const FInputField: React.FC<FInputFieldProps> = ({
             className="absolute right-3 top-0 h-12 justify-center"
             activeOpacity={0.7}
           >
-            <FText variant="body" className="text-neutral-500 text-lg">
-              {showPassword ? "👁️‍🗨️" : "👁️"}
-            </FText>
+            <Icon
+              name={showPassword ? "eye-outline" : "eye-off-outline"}
+              size={20}
+              color="#6b7280"
+            />
           </TouchableOpacity>
         )}
       </View>

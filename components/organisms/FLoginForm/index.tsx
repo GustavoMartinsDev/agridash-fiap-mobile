@@ -103,8 +103,6 @@ export const FLoginForm: React.FC<FLoginFormProps> = ({
       } else {
         irParaDashboard?.();
       }
-
-      Alert.alert("Sucesso", `Bem-vindo, ${email}!`);
     } catch (error: any) {
       console.error("Erro no login:", error);
 

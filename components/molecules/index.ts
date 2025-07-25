@@ -3,11 +3,13 @@ export { FLinkButton } from "./FLinkButton";
 export { FHeader } from "./FHeader";
 export { FSection } from "./FSection";
 export { FNotificationModal } from "./FNotificationModal";
+export { FPasswordStrength } from "./FPasswordStrength";
 
 export type { FInputFieldProps } from "./FInputField";
 export type { FLinkButtonProps } from "./FLinkButton";
 export type { FHeaderProps } from "./FHeader";
 export type { FSectionProps } from "./FSection";
+export type { PasswordStrengthProps } from "./FPasswordStrength";
 
 export { FInputField as InputField } from "./FInputField";
 export { FLinkButton as LinkButton } from "./FLinkButton";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Alert, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FContainer, FButton, FText } from "../../atoms";
-import { FInputField, FLinkButton } from "../../molecules";
+import { FInputField, FLinkButton, FPasswordStrength } from "../../molecules";
 import { useAuth } from "../../../context/AuthContext";
 import {
   FormData,
@@ -197,116 +197,12 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
   };
 
   const renderSenhaIndicadores = () => {
-    if (!formData.senha) return null;
-
-    const detalhes = validation.senhaDetalhes;
-    if (!detalhes) return null;
-
     return (
-      <FContainer className="mt-2 p-3 bg-neutral-50 rounded-lg border border-neutral-200">
-        <FText
-          variant="caption"
-          className="text-neutral-600 font-semibold mb-2"
-        >
-          🔐 Força da Senha:
-        </FText>
-
-        <FContainer className="space-y-1">
-          <FContainer className="flex-row items-center">
-            <FText
-              variant="caption"
-              className={
-                detalhes.comprimento ? "text-success-600" : "text-danger-600"
-              }
-            >
-              {detalhes.comprimento ? "✅" : "❌"} Mínimo 6 caracteres
-            </FText>
-          </FContainer>
-
-          <FContainer className="flex-row items-center">
-            <FText
-              variant="caption"
-              className={
-                detalhes.maiuscula ? "text-success-600" : "text-danger-600"
-              }
-            >
-              {detalhes.maiuscula ? "✅" : "❌"} Letra maiúscula (A-Z)
-            </FText>
-          </FContainer>
-
-          <FContainer className="flex-row items-center">
-            <FText
-              variant="caption"
-              className={
-                detalhes.minuscula ? "text-success-600" : "text-danger-600"
-              }
-            >
-              {detalhes.minuscula ? "✅" : "❌"} Letra minúscula (a-z)
-            </FText>
-          </FContainer>
-
-          <FContainer className="flex-row items-center">
-            <FText
-              variant="caption"
-              className={
-                detalhes.numero ? "text-success-600" : "text-danger-600"
-              }
-            >
-              {detalhes.numero ? "✅" : "❌"} Número (0-9)
-            </FText>
-          </FContainer>
-
-          <FContainer className="flex-row items-center">
-            <FText
-              variant="caption"
-              className={
-                detalhes.especial ? "text-success-600" : "text-danger-600"
-              }
-            >
-              {detalhes.especial ? "✅" : "❌"} Caractere especial (!@#$...)
-            </FText>
-          </FContainer>
-        </FContainer>
-
-        <FContainer className="mt-3">
-          <FContainer className="flex-row items-center mb-1">
-            <FText variant="caption" className="text-neutral-600 mr-2">
-              Força:
-            </FText>
-            <FText
-              variant="caption"
-              className={
-                validation.senhaValida
-                  ? "text-success-600 font-bold"
-                  : Object.values(detalhes).filter(Boolean).length >= 3
-                    ? "text-warning-600 font-bold"
-                    : "text-danger-600 font-bold"
-              }
-            >
-              {validation.senhaValida
-                ? "🟢 Forte"
-                : Object.values(detalhes).filter(Boolean).length >= 3
-                  ? "🟡 Média"
-                  : "🔴 Fraca"}
-            </FText>
-          </FContainer>
-
-          <FContainer className="h-2 bg-neutral-200 rounded-full overflow-hidden">
-            <FContainer
-              className={`h-full rounded-full ${
-                validation.senhaValida
-                  ? "bg-success-500"
-                  : Object.values(detalhes).filter(Boolean).length >= 3
-                    ? "bg-warning-500"
-                    : "bg-danger-500"
-              }`}
-              style={{
-                width: `${(Object.values(detalhes).filter(Boolean).length / 5) * 100}%`,
-              }}
-            />
-          </FContainer>
-        </FContainer>
-      </FContainer>
+      <FPasswordStrength
+        password={formData.senha}
+        isValid={validation.senhaValida}
+        details={validation.senhaDetalhes}
+      />
     );
   };
 
@@ -359,8 +255,6 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
             className="mb-2"
           />
 
-          {renderSenhaIndicadores()}
-
           <FInputField
             type="password"
             placeholder="Confirmar senha"
@@ -369,8 +263,9 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
             error={
               !validation.senhasIguais ? "As senhas não coincidem." : undefined
             }
-            className="mb-6"
           />
+
+          {renderSenhaIndicadores()}
 
           <FContainer className="mb-6 rounded-xl overflow-hidden shadow-lg">
             <LinearGradient
