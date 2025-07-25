@@ -239,7 +239,6 @@ export const FStockForm: React.FC<FStockFormProps> = ({
         )}
       </ScrollView>
 
-      {/* Produto Selecionado */}
       {estoqueSelecionado && (
         <FContainer
           className={`mb-4 p-3 rounded-lg border ${getStatusBgColor(estoqueSelecionado.quantidade_estoque, estoqueSelecionado.capacidade_estoque)}`}

@@ -139,14 +139,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
         </TouchableOpacity>
       )}
 
-      <FContainer className="flex-row mb-4 bg-white p-2 rounded-lg shadow-sm">
+      <FContainer className="flex-row mb-4 bg-white p-2 rounded-lg shadow-sm border">
         <FButton
           variant={activeTab === "vendas" ? "primary" : "secondary"}
           size="medium"
           onPress={() => setActiveTab("vendas")}
-          className={`flex-1 mr-1 ${
+          className={`flex-1 mr-1  ${
             activeTab === "vendas"
-              ? "bg-green-600 shadow-md"
+              ? "bg-green-600 shadow-md border"
               : "bg-white border-2 border-green-600"
           }`}
         >
@@ -158,7 +158,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
           onPress={() => setActiveTab("estoque")}
           className={`flex-1 ml-1 ${
             activeTab === "estoque"
-              ? "bg-blue-600 shadow-md"
+              ? "bg-blue-600 shadow-md border"
               : "bg-white border-2 border-blue-600"
           }`}
         >
@@ -169,7 +169,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
       {activeTab === "vendas" ? (
         <>
           <Section title="Registrar Venda">
-            <FSalesForm onSubmit={handleNovaVenda} className="mb-4" />
+            <FSalesForm onSubmit={handleNovaVenda} className="mb-4 border" />
           </Section>
 
           <Section title="Histórico de Vendas">
@@ -184,7 +184,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
         </>
       )}
 
-      {/* Modal de Notificações */}
       <FNotificationModal
         visible={modalNotificacaoVisivel}
         notificacoes={notificacoesNaoLidas}
