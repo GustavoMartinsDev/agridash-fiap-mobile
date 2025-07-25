@@ -1,7 +1,14 @@
 import React, { useState } from "react";
-import { Alert, Animated } from "react-native";
+import { Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { FContainer, FButton, FText } from "../../atoms";
+import {
+  FContainer,
+  FButton,
+  FText,
+  FAlert,
+  AlertMessageColor,
+  FAlertModel,
+} from "../../atoms";
 import { FInputField, FLinkButton, FPasswordStrength } from "../../molecules";
 import { useAuth } from "../../../context/AuthContext";
 import {
@@ -39,7 +46,24 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [alertData, setAlertData] = useState<FAlertModel | null>(null);
   const { signUp } = useAuth();
+
+  const showAlert = (
+    text: string,
+    type: AlertMessageColor = AlertMessageColor.Error
+  ) => {
+    const alertPopUp: FAlertModel = {
+      type,
+      textAlert: text,
+      options: {
+        visible: true,
+        onDismiss: () => setAlertData(null),
+        children: undefined,
+      },
+    };
+    setAlertData(alertPopUp);
+  };
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -114,7 +138,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
       !confirmarSenha ||
       !nome
     ) {
-      Alert.alert("Erro", "Verifique os campos e tente novamente.");
+      showAlert("Verifique os campos e tente novamente.");
       return;
     }
 
@@ -123,7 +147,10 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
     try {
       await signUp({ email, password: senha, displayName: nome });
 
-      Alert.alert("Sucesso", `Conta criada com sucesso! Bem-vindo, ${nome}!`);
+      showAlert(
+        `Conta criada com sucesso! Bem-vindo, ${nome}!`,
+        AlertMessageColor.Success
+      );
 
       if (onSubmit) {
         onSubmit(formData);
@@ -131,8 +158,6 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
         irParaLogin?.();
       }
     } catch (error: any) {
-      console.error("Erro no registro:", error);
-
       let errorMessage = "Erro ao criar conta. Tente novamente.";
 
       if (error.code === "auth/email-already-in-use") {
@@ -157,7 +182,10 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
       ) {
         errorMessage = "Sistema em modo demo. Cadastro simulado com sucesso!";
 
-        Alert.alert("Sucesso", "Conta criada com sucesso no modo demo!");
+        showAlert(
+          "Conta criada com sucesso no modo demo!",
+          AlertMessageColor.Success
+        );
 
         if (onSubmit) {
           onSubmit(formData);
@@ -171,7 +199,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
         errorMessage = `Erro: ${error.error.message}`;
       }
 
-      Alert.alert("Erro", errorMessage);
+      showAlert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -305,6 +333,7 @@ export const FRegisterForm: React.FC<FRegisterFormProps> = ({
           </FContainer>
         </FContainer>
       </FContainer>
+      {alertData && <FAlert {...alertData} />}
     </Animated.View>
   );
 };

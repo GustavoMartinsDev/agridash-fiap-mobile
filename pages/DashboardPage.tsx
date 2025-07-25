@@ -134,13 +134,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
           variant={activeTab === "vendas" ? "primary" : "secondary"}
           size="medium"
           onPress={() => setActiveTab("vendas")}
-          className={`flex-1 mr-1  ${
+          className={`flex-1 ml-1  ${
             activeTab === "vendas"
-              ? "bg-green-600 shadow-md border"
-              : "bg-white border-2 border-green-600"
+              ? "bg-blue-600 shadow-md border"
+              : "bg-white border-2 border-blue-600"
           }`}
         >
-          <FText className={`font-bold text-green-600`}>Vendas</FText>
+          <FText className={`font-bold text-blue-600`}>Vendas</FText>
         </FButton>
         <FButton
           variant={activeTab === "estoque" ? "primary" : "secondary"}
