@@ -12,8 +12,10 @@
 </p>
 
 <p align="center">
-  Sistema completo de controle de estoque, vendas e análise de dados para cooperativas e produtores rurais, desenvolvido com React Native e design system baseado em Atomic Design.
+  Sistema completo de controle de estoque, vendas e notificações automáticas para cooperativas e produtores rurais, desenvolvido com React Native, design system baseado em Atomic Design e arquitetura escalável.
 </p>
+
+**📚 Projeto Acadêmico - FIAP Pós-Graduação Front-end Engineering - Fase 5**
 
 Vídeo explicativo: https://youtu.be/9F0-2f7MNPw
 
@@ -29,6 +31,7 @@ Vídeo explicativo: https://youtu.be/9F0-2f7MNPw
 - [Configuração](#-configuração)
 - [Como Usar](#-como-usar)
 - [Arquitetura](#-arquitetura)
+- [Funcionalidades Avançadas](#-funcionalidades-avançadas)
 - [Contribuição](#-contribuição)
 - [Licença](#-licença)
 
@@ -45,6 +48,8 @@ O **AgriDash Mobile** é uma aplicação móvel desenvolvida para gestão agríc
 - **🏗️ Clean Architecture**: Código limpo e bem estruturado
 - **🔐 Segurança**: Autenticação robusta com Firebase Auth
 - **📴 Responsivo**: Interface adaptável para diferentes dispositivos
+- **🎨 Design System**: Sistema de cores e componentes centralizado
+- **🔔 Notificações Inteligentes**: Alertas automáticos para mudanças de estoque
 
 ---
 
@@ -82,10 +87,13 @@ O **AgriDash Mobile** é uma aplicação móvel desenvolvida para gestão agríc
 ### 🔔 **Sistema de Notificações**
 
 - Notificações em tempo real
+- **Criação automática** quando estoque é alterado
 - Modal dedicado para visualização
 - Marcação individual e em lote como lidas
 - Contador de notificações não lidas
 - Interface moderna com ícones profissionais
+- **Auto incremento de IDs** para controle sequencial
+- **Histórico completo** de alterações de estoque
 
 ---
 
@@ -104,7 +112,9 @@ O **AgriDash Mobile** é uma aplicação móvel desenvolvida para gestão agríc
 - **NativeWind** - Tailwind CSS para React Native
 - **Atomic Design Pattern** - Arquitetura de componentes escalável
 - **React Native Vector Icons** - Iconografia profissional
-- **Custom Design System** - Tokens e componentes reutilizáveis
+- **Custom Design System** - Sistema de cores e tema centralizado
+- **Design Tokens** - Paleta de cores, tipografia e espaçamentos
+- **Theme Provider** - Configuração global de tema
 
 ### **Backend & Database**
 
@@ -166,8 +176,13 @@ O **AgriDash Mobile** é uma aplicação móvel desenvolvida para gestão agríc
 │   └── 📄 AuthContext.tsx     # Contexto de autenticação
 ├── 📁 types/                  # Definições TypeScript
 │   └── 📄 index.ts           # Interfaces e tipos
-├── � config/                 # Configurações
-│   └── �📄 firebase.ts        # Config Firebase
+├── 📁 ui/                     # Sistema de Design e Theme
+│   ├── 📄 index.ts           # Exports centralizados
+│   ├── 📄 theme.ts           # Configuração completa do design system
+│   ├── 📄 colors.ts          # Helper para cores mais usadas
+│   └── 📄 tailwind.ts        # Utilitários Tailwind com theme
+├── 📁 config/                 # Configurações
+│   └── 📄 firebase.ts        # Config Firebase
 ├── 📁 constants/              # Constantes da aplicação
 ├── 📁 assets/                 # Recursos estáticos
 ├── 📄 App.tsx                 # Componente raiz
@@ -255,7 +270,7 @@ npx expo start
    📁 produtos/            # Catálogo de produtos
    📁 estoque/             # Controle de estoque
    📁 vendas/              # Histórico de vendas
-   � notificacoes/        # Sistema de notificações
+   📁 notificacoes/        # Sistema de notificações automáticas
    ```
 
 ### **Inicialização do Banco**
@@ -296,8 +311,10 @@ npx ts-node scripts/initDatabase.ts
 ### **5. Sistema de Notificações**
 
 - Visualize notificações em tempo real
+- **Notificações automáticas** quando estoque é alterado
 - Marque individualmente ou todas como lidas
 - Acompanhe status de leitura
+- **Histórico de alterações** de estoque detalhado
 
 ---
 
@@ -312,6 +329,25 @@ O projeto segue rigorosamente os princípios de clean code:
 - **Funções Pequenas**: Máximo de 20 linhas por função
 - **Sem Duplicação**: Reutilização através de componentes atômicos
 - **Tratamento de Erros**: Error boundaries e validações robustas
+
+### **Sistema de Design Centralizado**
+
+**Estrutura do Theme System:**
+
+```
+📁 ui/
+├── theme.ts          # Design tokens completos
+├── colors.ts         # Helper para cores frequentes
+├── tailwind.ts       # Utilitários CSS-in-JS
+└── index.ts          # Exports centralizados
+```
+
+**Benefícios do Design System:**
+
+- **Consistência Visual**: Cores e espaçamentos padronizados
+- **Manutenibilidade**: Mudanças globais em um local
+- **Type Safety**: TypeScript para validação de tema
+- **Escalabilidade**: Fácil adição de novos tokens
 
 ### **Design System - Atomic Design**
 
@@ -356,6 +392,67 @@ User Input → Form Validation → Firebase Service → Real-time Updates → UI
 - **Firebase Real-time** para sincronização automática
 - **Component Composition** para flexibilidade
 - **Error First Approach** para robustez
+- **Centralized Theme** para consistência visual
+- **Atomic Design** para escalabilidade de componentes
+- **Auto Notifications** para melhor UX
+
+---
+
+## 🚀 Funcionalidades Avançadas
+
+### **🔔 Sistema de Notificações Automáticas**
+
+**Criação Inteligente de Notificações:**
+
+- ✅ **Trigger automático** ao alterar estoque via FSalesForm ou FStockForm
+- ✅ **Auto incremento de IDs** baseado no último registro
+- ✅ **Mensagens descritivas** com detalhes da operação
+- ✅ **Timestamp automático** com data/hora da alteração
+- ✅ **Status de leitura** sincronizado em tempo real
+
+**Exemplo de Notificação:**
+
+```
+ID: 15 (auto incrementado)
+Título: "Estoque Atualizado"
+Mensagem: "5 unidade(s) adicionada do produto 'Milho'. Quantidade atual: 150"
+Data: 2025-07-25T10:30:00Z
+Status: Não lida
+```
+
+### **🎨 Sistema de Design Centralizado**
+
+**Theme Configuration:**
+
+```typescript
+// Uso simples
+import { theme, colors } from "../ui";
+
+// Cores diretas
+backgroundColor: colors.primary;
+color: colors.text.primary;
+
+// Theme completo
+backgroundColor: theme.colors.blue[600];
+```
+
+**Benefícios Implementados:**
+
+- ✅ **50+ cores predefinidas** com variações 50-900
+- ✅ **Tipografia padronizada** (tamanhos, pesos, line-heights)
+- ✅ **Sistema de espaçamento** baseado em grid 4px
+- ✅ **Shadows e border radius** consistentes
+- ✅ **Helper functions** para acesso dinâmico
+- ✅ **Type safety** completo com TypeScript
+
+**Migração Realizada:**
+
+- ✅ Substituição de **todas as cores hardcoded** por referências ao theme
+- ✅ **LoginPage/RegisterPage**: gradientes e cores de shadow
+- ✅ **FAlert**: sistema de cores dos alertas
+- ✅ **FSalesList**: cores de ícones e elementos visuais
+- ✅ **FInput**: placeholder colors
+- ✅ **Templates**: background colors
 
 ---
 
@@ -399,7 +496,7 @@ Este projeto está licenciado sob a **MIT License**. Veja o arquivo [LICENSE](LI
 
 ## 👥 Equipe
 
-Desenvolvido com ❤️ por **Gustavo, Gabriel, Luiz e Lincoln** para a **FIAP**.
+Desenvolvido com ❤️ por **Gustavo Martins, Gabriel, Luiz e Lincoln** para a **FIAP Pós-Graduação Front-end Engineering - Fase 5**.
 
 ---
 
