@@ -15,6 +15,8 @@
   Sistema completo de controle de estoque, vendas e análise de dados para cooperativas e produtores rurais, desenvolvido com React Native e design system baseado em Atomic Design.
 </p>
 
+Vídeo explicativo: https://youtu.be/9F0-2f7MNPw
+
 ---
 
 ## 📋 Índice
@@ -397,7 +399,7 @@ Este projeto está licenciado sob a **MIT License**. Veja o arquivo [LICENSE](LI
 
 ## 👥 Equipe
 
-Desenvolvido com ❤️ por **Gustavo Martins** para a **FIAP**.
+Desenvolvido com ❤️ por **Gustavo, Gabriel, Luiz e Lincoln** para a **FIAP**.
 
 ---
 
